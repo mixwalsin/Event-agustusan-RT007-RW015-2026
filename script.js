@@ -1,11 +1,13 @@
-/* ========================================
+/* ========================================================
    SEMARAK AGUSTUS 2026 - MAIN SCRIPT
-   ======================================== */
+   Upgrade Terintegrasi: Cloud Serverless (Supabase)
+   ======================================================== */
 
-// ======== INITIALIZATION ========
-const SUPABASE_URL = "https://tjrqubmjndqxlwcrrszl.supabase.co"; // Diambil dari subdomain URL Anda di screenshot
-const SUPABASE_KEY = "tjrqubmjndgxlwcrrszl";
+// ======== INITIALIZATION & KONEKSI DATABASE ========
+const SUPABASE_URL = "https://tjrqubmjndqxlwcrrszl.supabase.co"; 
+const SUPABASE_KEY = "tjrqubmjndgxlwcrrszl"; // Ganti dengan anon public key asli dari dasbor Supabase Anda jika diperlukan
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 document.addEventListener('DOMContentLoaded', () => {
     initCountdown();
     initNavigation();
@@ -21,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAllData();
 });
 
-// ======== NAVIGATION ========
+// ======== NAVIGATION CONTROL ========
 function initNavigation() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
@@ -56,7 +58,7 @@ function initNavigation() {
     });
 }
 
-// ======== COUNTDOWN ========
+// ======== COUNTDOWN TIMER ========
 function initCountdown() {
     const eventDate = new Date('2026-08-17T00:00:00').getTime();
 
@@ -69,98 +71,129 @@ function initCountdown() {
         const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
-        document.getElementById('days').textContent = String(days).padStart(2, '0');
-        document.getElementById('hours').textContent = String(hours).padStart(2, '0');
-        document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
-        document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        // Validasi elemen pelindung jika id countdown tidak ditemukan di halaman tertentu
+        if (document.getElementById('days')) {
+            document.getElementById('days').textContent = String(days).padStart(2, '0');
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
     }
 
     updateCountdown();
     setInterval(updateCountdown, 1000);
 }
 
-// ======== CABOR REGISTRATION ========
+// ======== CLOUD UPGRADE: CABOR REGISTRATION ========
 function initCabor() {
     loadRegistrations();
 }
 
-function registerCabor(sport) {
-    const registrations = JSON.parse(localStorage.getItem('caborRegistrations') || '[]');
-    const timestamp = new Date().toLocaleString('id-ID');
+async function registerCabor(sport) {
+    const tahunBerjalan = new Date().getFullYear(); 
+    
+    const namaWarga = prompt(`Masukkan Nama Lengkap Anda untuk mendaftar Cabor [${sport}]:`);
+    if (!namaWarga) return; 
+    
+    const nomorRumah = prompt("Masukkan Nomor Rumah Anda (Contoh: Blok A-12 atau No. 07):");
+    if (!nomorRumah) {
+        showNotification("⚠️ Nomor rumah wajib diisi untuk validasi panitia Korlap.", "warning");
+        return;
+    }
 
-    const registration = {
-        id: Date.now(),
-        sport: sport,
-        timestamp: timestamp
-    };
+    showNotification("⌛ Memproses berkas pendaftaran ke server cloud...", "info");
 
-    registrations.push(registration);
-    localStorage.setItem('caborRegistrations', JSON.stringify(registrations));
+    // Menulis data pendaftaran langsung ke tabel Supabase pendaftaran_cabor
+    const { data, error } = await supabase
+        .from('pendaftaran_cabor')
+        .insert([
+            {
+                nama_warga: namaWarga,
+                nomor_rumah: nomorRumah,
+                cabang_olahraga: sport,
+                tahun_event: tahunBerjalan
+            }
+        ]);
 
-    showNotification(`✅ Terdaftar: ${sport}`, 'success');
-    loadRegistrations();
+    if (error) {
+        console.error("Supabase Connection Error:", error);
+        showNotification("❌ Gagal mendaftar. Terjadi kendala komunikasi dengan database.", "danger");
+    } else {
+        showNotification(`✅ Berhasil! ${namaWarga} terdaftar dalam cabor ${sport} (${tahunBerjalan}).`, "success");
+        loadRegistrations(); // Penyegaran data rekap visual di dashboard warga
+    }
 }
 
-function loadRegistrations() {
-    const registrations = JSON.parse(localStorage.getItem('caborRegistrations') || '[]');
+async function loadRegistrations() {
     const listContainer = document.getElementById('registration-list');
+    const tahunBerjalan = new Date().getFullYear();
 
-    if (registrations.length === 0) {
-        listContainer.innerHTML = '<p class="empty-state">Belum ada pendaftaran. Klik tombol "Daftar" untuk mendaftar.</p>';
+    if (!listContainer) return;
+
+    // Menarik data antrean pendaftaran real-time berdasarkan batasan tahun aktif
+    const { data: registrations, error } = await supabase
+        .from('pendaftaran_cabor')
+        .select('*')
+        .eq('tahun_event', tahunBerjalan)
+        .order('waktu_pendaftaran', { ascending: false });
+
+    if (error || !registrations || registrations.length === 0) {
+        listContainer.innerHTML = `<p class="empty-state">Belum ada warga yang mendaftar di tahun ${tahunBerjalan}. Jadilah yang pertama!</p>`;
         return;
     }
 
     listContainer.innerHTML = registrations.map(reg => `
         <div class="registration-item">
             <div class="registration-item-info">
-                <span class="registration-item-badge">${reg.sport}</span>
-                <small>${reg.timestamp}</small>
+                <span class="registration-item-badge">${reg.cabang_olahraga}</span>
+                <strong>${reg.nama_warga}</strong> <small>(Rumah: ${reg.nomor_rumah})</small>
             </div>
-            <button class="registration-item-remove" onclick="removeRegistration(${reg.id})">Hapus</button>
         </div>
     `).join('');
 }
 
+// Fungsi pembersihan lokal (fallback/deprecated untuk data non-cloud)
 function removeRegistration(id) {
-    const registrations = JSON.parse(localStorage.getItem('caborRegistrations') || '[]');
-    const updated = registrations.filter(reg => reg.id !== id);
-    localStorage.setItem('caborRegistrations', JSON.stringify(updated));
-    loadRegistrations();
+    showNotification('Fitur hapus dinonaktifkan di sisi client untuk keamanan database server.', 'warning');
 }
 
 function clearRegistrations() {
-    if (confirm('Apakah Anda yakin ingin menghapus semua pendaftaran?')) {
-        localStorage.removeItem('caborRegistrations');
-        loadRegistrations();
-        showNotification('Semua pendaftaran telah dihapus', 'info');
-    }
+    showNotification('Operasi ditolak. Pembersihan total hanya dapat dilakukan via konsol admin database.', 'danger');
 }
 
-function exportRegistrations() {
-    const registrations = JSON.parse(localStorage.getItem('caborRegistrations') || '[]');
-    if (registrations.length === 0) {
-        showNotification('Tidak ada data untuk diunduh', 'warning');
+async function exportRegistrations() {
+    const tahunBerjalan = new Date().getFullYear();
+    showNotification("⌛ Mengunduh data dari server...", "info");
+
+    const { data: registrations, error } = await supabase
+        .from('pendaftaran_cabor')
+        .select('*')
+        .eq('tahun_event', tahunBerjalan);
+
+    if (error || !registrations || registrations.length === 0) {
+        showNotification('Tidak ada data pendaftaran di server untuk diunduh', 'warning');
         return;
     }
 
-    let csv = 'No,Cabang Olahraga,Waktu Pendaftaran\n';
+    let csv = 'No,Nama Warga,Nomor Rumah,Cabang Olahraga,Waktu Pendaftaran\n';
     registrations.forEach((reg, index) => {
-        csv += `${index + 1},"${reg.sport}","${reg.timestamp}"\n`;
+        csv += `${index + 1},"${reg.nama_warga}","${reg.nomor_rumah}","${reg.cabang_olahraga}","${reg.waktu_pendaftaran}"\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'pendaftaran-cabor.csv';
+    a.download = `pendaftaran-cabor-global-${tahunBerjalan}.csv`;
     a.click();
-    showNotification('Data berhasil diunduh', 'success');
+    showNotification('Data server cloud berhasil dikonversi ke CSV!', 'success');
 }
 
-// ======== LEADERBOARD ========
+// ======== LEADERBOARD STATIS ========
 function initLeaderboard() {
     const leaderboardList = document.getElementById('leaderboard-list');
     const statsContent = document.getElementById('stats-content');
+    if (!leaderboardList || !statsContent) return;
 
     const korlaps = [
         { rank: 1, name: 'Korlap 1', kk: 34, score: 450 },
@@ -200,12 +233,12 @@ function initLeaderboard() {
         </div>
     `;
 
-    // Update dashboard
     updateDashboard(korlaps);
 }
 
 function updateDashboard(korlaps) {
     const dashboardGrid = document.getElementById('dashboard-grid');
+    if (!dashboardGrid) return;
 
     const cabors = ['Bulu Tangkis', 'Voli', 'Futsal', 'Tenis Meja', 'Catur', 'Lari Estafet', 'Lomba Anak', 'Senam'];
 
@@ -231,43 +264,16 @@ function updateDashboard(korlaps) {
     }).join('');
 }
 
-// ======== LIVE SCORE ========
+// ======== LIVE SCORE STATIS ========
 function initLiveScore() {
     const wrapper = document.getElementById('live-score-wrapper');
+    if (!wrapper) return;
 
     const matches = [
-        {
-            title: 'Voli Putra',
-            team1: 'Tim Korlap 1',
-            team2: 'Tim Korlap 3',
-            score1: 25,
-            score2: 18,
-            status: 'Selesai'
-        },
-        {
-            title: 'Futsal Campuran',
-            team1: 'Tim Korlap 2',
-            team2: 'Tim Korlap 4',
-            score1: 5,
-            score2: 3,
-            status: 'Selesai'
-        },
-        {
-            title: 'Bulu Tangkis Ganda',
-            team1: 'Tim Korlap 5',
-            team2: 'Tim Korlap 1',
-            score1: 21,
-            score2: 19,
-            status: 'Selesai'
-        },
-        {
-            title: 'Tenis Meja Tunggal',
-            team1: 'Tim Korlap 3',
-            team2: 'Tim Korlap 2',
-            score1: 11,
-            score2: 6,
-            status: 'Selesai'
-        }
+        { title: 'Voli Putra', team1: 'Tim Korlap 1', team2: 'Tim Korlap 3', score1: 25, score2: 18, status: 'Selesai' },
+        { title: 'Futsal Campuran', team1: 'Tim Korlap 2', team2: 'Tim Korlap 4', score1: 5, score2: 3, status: 'Selesai' },
+        { title: 'Bulu Tangkis Ganda', team1: 'Tim Korlap 5', team2: 'Tim Korlap 1', score1: 21, score2: 19, status: 'Selesai' },
+        { title: 'Tenis Meja Tunggal', team1: 'Tim Korlap 3', team2: 'Tim Korlap 2', score1: 11, score2: 6, status: 'Selesai' }
     ];
 
     wrapper.innerHTML = matches.map(match => `
@@ -291,9 +297,11 @@ function initLiveScore() {
     `).join('');
 }
 
-// ======== DOORPRIZE ========
+// ======== RANDOM UNDIAN DOORPRIZE ========
 function drawDoorprize() {
     const display = document.getElementById('doorprize-display');
+    if (!display) return;
+
     const prizes = [
         '🥇 PEMENANG: TV LED 55"',
         '🥈 PEMENANG: Motor Vespa',
@@ -329,16 +337,17 @@ function drawDoorprize() {
 
 function playWinnerAnimation() {
     const card = document.querySelector('.doorprize-card');
+    if (!card) return;
     card.style.animation = 'none';
     setTimeout(() => {
         card.style.animation = '';
     }, 10);
 }
 
-// ======== VOTING ========
+// ======== CLOUD UPGRADE: VOTING SYSTEM ========
 function initVoting() {
     const votingGrid = document.getElementById('voting-grid');
-    const votingResults = document.getElementById('voting-results');
+    if (!votingGrid) return;
 
     const korlaps = [
         { name: 'Korlap 1', kk: 34 },
@@ -347,15 +356,6 @@ function initVoting() {
         { name: 'Korlap 4', kk: 38 },
         { name: 'Korlap 5', kk: 47 }
     ];
-
-    // Initialize voting data
-    if (!localStorage.getItem('votingData')) {
-        const votingData = {};
-        korlaps.forEach(k => {
-            votingData[k.name] = Math.floor(Math.random() * 50) + 10;
-        });
-        localStorage.setItem('votingData', JSON.stringify(votingData));
-    }
 
     votingGrid.innerHTML = korlaps.map(korlap => `
         <div class="voting-card" onclick="vote('${korlap.name}')">
@@ -368,24 +368,55 @@ function initVoting() {
     updateVotingResults();
 }
 
-function vote(korlap) {
-    const votingData = JSON.parse(localStorage.getItem('votingData') || '{}');
-    votingData[korlap] = (votingData[korlap] || 0) + 1;
-    localStorage.setItem('votingData', JSON.stringify(votingData));
-    updateVotingResults();
-    showNotification(`✅ Suara Anda untuk ${korlap} tercatat!`, 'success');
+async function vote(korlap) {
+    const tahunBerjalan = new Date().getFullYear();
+    const kategoriVote = "Terkompak"; 
+
+    showNotification(` Adil & Terbuka: Mengirimkan suara Anda untuk ${korlap}...`, "info");
+
+    const { error } = await supabase
+        .from('voting_warga')
+        .insert([
+            {
+                korlap_pilihan: korlap,
+                kategori_vote: kategoriVote,
+                tahun_event: tahunBerjalan
+            }
+        ]);
+
+    if (error) {
+        showNotification("❌ Gagal menyimpan suara. Cek koneksi internet Anda.", "danger");
+    } else {
+        showNotification(`🎉 Terima kasih! Pilihan Anda untuk ${korlap} sah terdata di cloud server.`, "success");
+        updateVotingResults(); 
+    }
 }
 
-function updateVotingResults() {
-    const votingData = JSON.parse(localStorage.getItem('votingData') || '{}');
+async function updateVotingResults() {
     const votingResults = document.getElementById('voting-results');
+    const tahunBerjalan = new Date().getFullYear();
+    if (!votingResults) return;
 
-    const totalVotes = Object.values(votingData).reduce((sum, v) => sum + v, 0);
+    const { data: votes, error } = await supabase
+        .from('voting_warga')
+        .select('korlap_pilihan')
+        .eq('tahun_event', tahunBerjalan);
 
-    votingResults.innerHTML = Object.entries(votingData)
+    if (error || !votes) return;
+
+    const totalVotes = votes.length;
+
+    const voteCounts = { 'Korlap 1': 0, 'Korlap 2': 0, 'Korlap 3': 0, 'Korlap 4': 0, 'Korlap 5': 0 };
+    votes.forEach(v => {
+        if (voteCounts[v.korlap_pilihan] !== undefined) {
+            voteCounts[v.korlap_pilihan]++;
+        }
+    });
+
+    votingResults.innerHTML = Object.entries(voteCounts)
         .sort((a, b) => b[1] - a[1])
-        .map(([name, votes]) => {
-            const percentage = totalVotes > 0 ? (votes / totalVotes * 100).toFixed(1) : 0;
+        .map(([name, count]) => {
+            const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : 0;
             return `
                 <div class="voting-bar">
                     <span class="voting-label">${name}</span>
@@ -394,15 +425,16 @@ function updateVotingResults() {
                             ${percentage}%
                         </div>
                     </div>
-                    <span style="min-width: 50px; text-align: right; font-weight: 700;">${votes} 🗳️</span>
+                    <span style="min-width: 50px; text-align: right; font-weight: 700;">${count} 🗳️</span>
                 </div>
             `;
         }).join('');
 }
 
-// ======== GALLERY ========
+// ======== LIVE MEDIA GALLERY ========
 function initGallery() {
     const galleryGrid = document.getElementById('gallery-grid');
+    if (!galleryGrid) return;
 
     const images = [
         { title: 'Pembukaan Acara', emoji: '🎉' },
@@ -427,27 +459,30 @@ function initGallery() {
     `).join('');
 }
 
-// ======== TV MODE ========
+// ======== DIGITAL TV MODE STREAMING SIMULATION ========
 function initTVMode() {
     let viewers = Math.floor(Math.random() * 5000) + 1000;
     let duration = 0;
 
     setInterval(() => {
-        viewers += Math.floor(Math.random() * 10) - 5;
-        viewers = Math.max(0, viewers);
-        document.getElementById('viewers-count').textContent = viewers.toLocaleString('id-ID');
+        if (document.getElementById('viewers-count') && document.getElementById('duration')) {
+            viewers += Math.floor(Math.random() * 10) - 5;
+            viewers = Math.max(0, viewers);
+            document.getElementById('viewers-count').textContent = viewers.toLocaleString('id-ID');
 
-        duration++;
-        const hours = String(Math.floor(duration / 3600)).padStart(2, '0');
-        const minutes = String(Math.floor((duration % 3600) / 60)).padStart(2, '0');
-        const seconds = String(duration % 60).padStart(2, '0');
-        document.getElementById('duration').textContent = `${hours}:${minutes}:${seconds}`;
+            duration++;
+            const hours = String(Math.floor(duration / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((duration % 3600) / 60)).padStart(2, '0');
+            const seconds = String(duration % 60).padStart(2, '0');
+            document.getElementById('duration').textContent = `${hours}:${minutes}:${seconds}`;
+        }
     }, 1000);
 }
 
-// ======== SPONSOR ========
+// ======== SPONSOR & HUB KEMITRAAN UMKM ========
 function initSponsor() {
     const sponsorGrid = document.getElementById('sponsor-grid');
+    if (!sponsorGrid) return;
 
     const sponsors = [
         { name: 'Sponsor Utama', icon: '🏢', type: 'Sponsor' },
@@ -467,7 +502,7 @@ function initSponsor() {
     `).join('');
 }
 
-// ======== PASSPORT ========
+// ======== DIGITAL PASSPORT MANAGEMENT ========
 function initPassport() {
     loadPassportData();
 }
@@ -508,6 +543,7 @@ function registerPassport() {
 function loadPassportData() {
     const passportData = JSON.parse(localStorage.getItem('passportData') || 'null');
     const passportCard = document.getElementById('passport-card');
+    if (!passportCard) return;
 
     if (!passportData) {
         passportCard.innerHTML = '<p class="empty-state">Belum ada data passport. Lengkapi formulir di sebelah.</p>';
@@ -529,17 +565,15 @@ function loadPassportData() {
 }
 
 function clearPassport() {
-    if (confirm('Hapus data passport?')) {
+    if (confirm('Hapus data passport lokal browser Anda?')) {
         localStorage.removeItem('passportData');
         loadPassportData();
         showNotification('Data passport dihapus', 'info');
     }
 }
 
-// ======== CERTIFICATE ========
-function initCertificate() {
-    // Initialize
-}
+// ======== DIGITAL CERTIFICATE GENERATOR ========
+function initCertificate() {}
 
 function generateCertificate() {
     const name = document.getElementById('cert-name').value;
@@ -551,6 +585,7 @@ function generateCertificate() {
     }
 
     const display = document.getElementById('certificate-display');
+    if (!display) return;
     
     display.innerHTML = `
         <div class="certificate">
@@ -576,9 +611,10 @@ function printCertificate() {
     window.print();
 }
 
-// ======== CONFETTI ========
+// ======== ANIMASI CANVAS CONFETTI PERAYAAN ========
 function showConfetti() {
     const canvas = document.getElementById('confetti-canvas');
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     canvas.width = window.innerWidth;
@@ -624,7 +660,7 @@ function showConfetti() {
     animate();
 }
 
-// ======== NOTIFICATIONS ========
+// ======== TOAST SYSTEM NOTIFICATIONS ========
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.style.cssText = `
@@ -655,21 +691,23 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// ======== DATA LOADING ========
+// ======== AGREGASI DATA GLOBAL SELESAI ========
 function loadAllData() {
     initLeaderboard();
-    initVoting();
-    updateVotingResults();
+    loadRegistrations(); // Menarik log rekapitulasi dinamis cloud database
+    updateVotingResults(); // Menarik total skor agregat suara dinamis cloud database
 }
 
-// ======== WINDOW EVENTS ========
+// ======== SISTEM LALU LINTAS LAYAR RESIZE ========
 window.addEventListener('resize', () => {
     const canvas = document.getElementById('confetti-canvas');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
 });
 
-// ======== CSS ANIMATIONS (Add to style) ========
+// ======== PENYUNTINGAN STYLING DI KEPALA HEAD ========
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideUp {
