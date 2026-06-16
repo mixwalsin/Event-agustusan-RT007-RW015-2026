@@ -3,6 +3,9 @@
    ======================================== */
 
 // ======== INITIALIZATION ========
+const SUPABASE_URL = "https://tjrqubmjndqxlwcrrszl.supabase.co"; // Diambil dari subdomain URL Anda di screenshot
+const SUPABASE_KEY = "tjrqubmjndgxlwcrrszl";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 document.addEventListener('DOMContentLoaded', () => {
     initCountdown();
     initNavigation();
