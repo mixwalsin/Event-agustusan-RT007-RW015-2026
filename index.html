@@ -1,264 +1,1124 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEMARAK AGUSTUS 2026 - HUT RI KE-81 | RT 007 RW 015 TCI 2</title>
-    <meta name="description" content="Guyub, Sportif, Meriah, dan Digital - Event Agustusan Digital 2026 RT 007 RW 015">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23DC143C'>🇮🇩</text></svg>">
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="container">
-            <div class="logo">
-                <span class="logo-text">🇮🇩 SEMARAK AGUSTUS 2026</span>
-                <p class="tagline">Guyub, Sportif, Meriah, dan Digital</p>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#home" class="nav-link active">Beranda</a></li>
-                <li><a href="#countdown" class="nav-link">Countdown</a></li>
-                <li><a href="#cabor" class="nav-link">Cabor</a></li>
-                <li><a href="#leaderboard" class="nav-link">Leaderboard</a></li>
-                <li><a href="#doorprize" class="nav-link">Doorprize</a></li>
-                <li><a href="#voting" class="nav-link">Voting</a></li>
-                <li><a href="hasil.html" class="nav-link">Hasil Event</a></li>
-            </ul>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+/* ========================================================
+   SEMARAK AGUSTUS 2026 - MAIN SCRIPT FINAL
+   RT 007 / RW 015 TCI 2
+   Mode: GitHub Pages + localStorage
+   ======================================================== */
+
+(function () {
+  "use strict";
+
+  const STORAGE = {
+    registrations: "hutri81_registrations_rt007_v1",
+    votes: "hutri81_votes_rt007_v1",
+    passport: "hutri81_passport_rt007_v1"
+  };
+
+  const DEFAULT_EVENT_CONFIG = {
+    namaEvent: "SEMARAK AGUSTUS 2026",
+    hut: "HUT RI KE-81",
+    penyelenggara: "RT 007 / RW 015 TCI 2",
+    tema: "Guyub, Sportif, Meriah, dan Digital",
+    tanggalPuncak: "2026-08-17T07:00:00",
+    lokasi: "Lapangan RT 007 RW 015 TCI 2",
+    jumlahKK: 229,
+    jumlahKorlap: 5
+  };
+
+  const DEFAULT_CABOR_LIST = [
+    { id: "badminton-bapak", nama: "Badminton Bapak", kategori: "Dewasa", lokasi: "Lapangan Badminton", status: "Pendaftaran Dibuka", icon: "🏸" },
+    { id: "badminton-ibu", nama: "Badminton Ibu", kategori: "Dewasa", lokasi: "Lapangan Badminton", status: "Pendaftaran Dibuka", icon: "🏸" },
+    { id: "voli-bapak", nama: "Bola Voli Bapak", kategori: "Dewasa", lokasi: "Lapangan Voli", status: "Pendaftaran Dibuka", icon: "🏐" },
+    { id: "voli-ibu", nama: "Bola Voli Ibu", kategori: "Dewasa", lokasi: "Lapangan Voli", status: "Pendaftaran Dibuka", icon: "🏐" },
+    { id: "futsal-anak", nama: "Futsal Anak", kategori: "Anak-Anak", lokasi: "Lapangan Fasos", status: "Pendaftaran Dibuka", icon: "⚽" },
+    { id: "mancing", nama: "Mancing Mania", kategori: "Umum", lokasi: "Kolam Pemancingan", status: "Segera Dibuka", icon: "🎣" },
+    { id: "tenis-meja", nama: "Tenis Meja Bapak", kategori: "Dewasa", lokasi: "Area Fasos", status: "Pendaftaran Dibuka", icon: "🏓" },
+    { id: "esport", nama: "E-Sport", kategori: "Remaja", lokasi: "Online / Posko Panitia", status: "Pendaftaran Dibuka", icon: "🎮" }
+  ];
+
+  const DEFAULT_JADWAL = [
+    { tanggal: "Juli 2026", agenda: "Pembentukan panitia, publikasi awal, dan finalisasi cabang lomba." },
+    { tanggal: "1 - 10 Agustus 2026", agenda: "Pendaftaran peserta lomba dan verifikasi data warga." },
+    { tanggal: "11 - 16 Agustus 2026", agenda: "Babak penyisihan cabang lomba dan persiapan malam puncak." },
+    { tanggal: "17 Agustus 2026", agenda: "Upacara, final lomba, doorprize, hiburan warga, dan malam puncak." }
+  ];
+
+  const DEFAULT_KORLAP = [
+    { nama: "Korlap 1", kk: 34 },
+    { nama: "Korlap 2", kk: 47 },
+    { nama: "Korlap 3", kk: 63 },
+    { nama: "Korlap 4", kk: 38 },
+    { nama: "Korlap 5", kk: 47 }
+  ];
+
+  const EVENT_CONFIG = window.EVENT_CONFIG || DEFAULT_EVENT_CONFIG;
+  const CABOR_LIST = Array.isArray(window.CABOR_LIST) && window.CABOR_LIST.length
+    ? window.CABOR_LIST
+    : DEFAULT_CABOR_LIST;
+  const JADWAL_HUTRI = Array.isArray(window.JADWAL_HUTRI) && window.JADWAL_HUTRI.length
+    ? window.JADWAL_HUTRI
+    : DEFAULT_JADWAL;
+  const KORLAP_LIST = Array.isArray(window.KORLAP_LIST) && window.KORLAP_LIST.length
+    ? window.KORLAP_LIST
+    : DEFAULT_KORLAP;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    injectNotificationStyle();
+    initNavigation();
+    initCountdown();
+    renderCaborGrid();
+    renderJadwal();
+    initCaborOptions();
+    initFormPendaftaran();
+    initLeaderboard();
+    initVoting();
+    initGallery();
+    initTVMode();
+    initSponsor();
+    initPassport();
+    initCertificate();
+
+    loadRegistrations();
+    updateVotingResults();
+  });
+
+  function el(id) {
+    return document.getElementById(id);
+  }
+
+  function setAllText(id, value) {
+    document.querySelectorAll("#" + id).forEach(function (item) {
+      item.textContent = value;
+    });
+  }
+
+  function safeJsonParse(value, fallback) {
+    try {
+      return JSON.parse(value) || fallback;
+    } catch (error) {
+      return fallback;
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function escapeCsv(value) {
+    return String(value || "").replaceAll('"', '""');
+  }
+
+  function getRegistrations() {
+    return safeJsonParse(localStorage.getItem(STORAGE.registrations), []);
+  }
+
+  function saveRegistrations(data) {
+    localStorage.setItem(STORAGE.registrations, JSON.stringify(data));
+  }
+
+  function getVotes() {
+    return safeJsonParse(localStorage.getItem(STORAGE.votes), []);
+  }
+
+  function saveVotes(data) {
+    localStorage.setItem(STORAGE.votes, JSON.stringify(data));
+  }
+
+  function normalizeKorlap(input) {
+    const text = String(input || "").trim();
+
+    if (/^korlap\s*[1-5]$/i.test(text)) {
+      return text.replace(/\s+/g, " ").replace(/^korlap/i, "Korlap");
+    }
+
+    if (/^[1-5]$/.test(text)) {
+      return "Korlap " + text;
+    }
+
+    return text;
+  }
+
+  function downloadFile(filename, content, mimeType) {
+    const blob = new Blob(["\uFEFF" + content], { type: mimeType || "text/plain;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  }
+
+  /* =========================
+     NAVIGATION
+     ========================= */
+
+  function initNavigation() {
+    const hamburger = document.querySelector(".hamburger");
+    const navMenu = document.querySelector(".nav-menu");
+    const navLinks = document.querySelectorAll(".nav-link");
+
+    if (hamburger && navMenu) {
+      hamburger.addEventListener("click", function () {
+        navMenu.classList.toggle("active");
+      });
+    }
+
+    navLinks.forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (navMenu) navMenu.classList.remove("active");
+
+        navLinks.forEach(function (item) {
+          item.classList.remove("active");
+        });
+
+        link.classList.add("active");
+      });
+    });
+
+    window.addEventListener("scroll", function () {
+      const sections = document.querySelectorAll("section[id]");
+      const scrollPosition = window.scrollY + 180;
+
+      sections.forEach(function (section) {
+        const top = section.offsetTop;
+        const height = section.offsetHeight;
+
+        if (scrollPosition >= top && scrollPosition < top + height) {
+          navLinks.forEach(function (link) {
+            link.classList.remove("active");
+          });
+
+          const active = document.querySelector('.nav-link[href="#' + section.id + '"]');
+          if (active) active.classList.add("active");
+        }
+      });
+    });
+  }
+
+  /* =========================
+     COUNTDOWN
+     ========================= */
+
+  function initCountdown() {
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  }
+
+  function updateCountdown() {
+    const target = new Date(EVENT_CONFIG.tanggalPuncak || "2026-08-17T07:00:00").getTime();
+    const now = Date.now();
+    const distance = Math.max(0, target - now);
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((distance / (1000 * 60)) % 60);
+    const seconds = Math.floor((distance / 1000) % 60);
+
+    setAllText("days", String(days).padStart(2, "0"));
+    setAllText("hours", String(hours).padStart(2, "0"));
+    setAllText("minutes", String(minutes).padStart(2, "0"));
+    setAllText("seconds", String(seconds).padStart(2, "0"));
+  }
+
+  /* =========================
+     CABOR & JADWAL
+     ========================= */
+
+  function renderCaborGrid() {
+    const grid = el("caborGrid");
+    if (!grid) return;
+
+    grid.innerHTML = CABOR_LIST.map(function (cabor) {
+      return `
+        <div class="cabor-card">
+          <div class="cabor-icon" style="font-size:42px;margin-bottom:10px;">${escapeHtml(cabor.icon || "🏆")}</div>
+          <h3>${escapeHtml(cabor.nama)}</h3>
+          <p><strong>Kategori:</strong> ${escapeHtml(cabor.kategori || "-")}</p>
+          <p><strong>Lokasi:</strong> ${escapeHtml(cabor.lokasi || "-")}</p>
+          <button class="btn btn-small" type="button" onclick="registerCabor('${escapeHtml(cabor.nama)}')">Daftar</button>
+          <span class="cabor-status">${escapeHtml(cabor.status || "Info")}</span>
         </div>
-    </nav>
+      `;
+    }).join("");
+  }
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-background">
-            <div class="hero-blob hero-blob-1"></div>
-            <div class="hero-blob hero-blob-2"></div>
+  function renderJadwal() {
+    const list = el("jadwalList");
+    if (!list) return;
+
+    list.innerHTML = JADWAL_HUTRI.map(function (item) {
+      return `
+        <div class="jadwal-item">
+          <strong>${escapeHtml(item.tanggal)}</strong>
+          <p>${escapeHtml(item.agenda)}</p>
         </div>
-        <div class="container hero-content">
-            <h1 class="hero-title">SEMARAK AGUSTUS 2026</h1>
-            <p class="hero-subtitle">HUT RI KE-81</p>
-            <p class="hero-desc">RT 007 RW 015 TCI 2</p>
-            <p class="hero-tagline">Guyub • Sportif • Meriah • Digital</p>
-            <div class="hero-buttons">
-                <a href="#cabor" class="btn btn-primary">Daftar Cabor</a>
-                <a href="#voting" class="btn btn-secondary">Ikuti Voting</a>
-                <a href="hasil.html" class="btn btn-accent">📊 LIHAT HASIL EVENT</a>
-            </div>
+      `;
+    }).join("");
+  }
+
+  function initCaborOptions() {
+    const select = el("caborPeserta");
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Pilih Cabang Lomba</option>';
+
+    CABOR_LIST.forEach(function (cabor) {
+      const option = document.createElement("option");
+      option.value = cabor.nama;
+      option.textContent = cabor.nama;
+      select.appendChild(option);
+    });
+  }
+
+  /* =========================
+     PENDAFTARAN PESERTA
+     ========================= */
+
+  function initFormPendaftaran() {
+    const form = el("formPendaftaran");
+    if (!form) return;
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const namaInput = el("namaPeserta");
+      const korlapInput = el("korlapPeserta");
+      const caborInput = el("caborPeserta");
+
+      const nama = namaInput ? namaInput.value.trim() : "";
+      const korlap = korlapInput ? normalizeKorlap(korlapInput.value) : "";
+      const cabor = caborInput ? caborInput.value : "";
+
+      if (!nama || !korlap || !cabor) {
+        showNotification("Nama peserta, Korlap, dan Cabang Lomba wajib diisi.", "warning");
+        return;
+      }
+
+      addRegistration({
+        nama: nama,
+        korlap: korlap,
+        cabor: cabor,
+        nomorRumah: "-",
+        sumber: "Form Website"
+      });
+
+      form.reset();
+      initCaborOptions();
+      showNotification("✅ Data peserta berhasil masuk.", "success");
+    });
+  }
+
+  function addRegistration(payload) {
+    const data = getRegistrations();
+
+    const nama = String(payload.nama || "").trim();
+    const cabor = String(payload.cabor || "").trim();
+
+    const duplicate = data.some(function (item) {
+      return String(item.nama || "").toLowerCase() === nama.toLowerCase() &&
+        String(item.cabor || "").toLowerCase() === cabor.toLowerCase();
+    });
+
+    if (duplicate) {
+      showNotification("⚠️ Peserta ini sudah terdaftar di cabang lomba yang sama.", "warning");
+      return false;
+    }
+
+    data.push({
+      id: Date.now(),
+      nama: nama,
+      korlap: normalizeKorlap(payload.korlap),
+      cabor: cabor,
+      nomorRumah: payload.nomorRumah || "-",
+      sumber: payload.sumber || "Website",
+      waktu: new Date().toLocaleString("id-ID")
+    });
+
+    saveRegistrations(data);
+    loadRegistrations();
+    return true;
+  }
+
+  function registerCabor(sport) {
+    const nama = prompt("Masukkan nama lengkap peserta untuk " + sport + ":");
+    if (!nama) return;
+
+    const nomorRumah = prompt("Masukkan nomor rumah / blok:");
+    if (!nomorRumah) {
+      showNotification("Nomor rumah wajib diisi.", "warning");
+      return;
+    }
+
+    const korlapInput = prompt("Masukkan Korlap peserta. Contoh: 1, 2, 3, 4, 5");
+    const korlap = normalizeKorlap(korlapInput);
+
+    const validKorlap = KORLAP_LIST.some(function (item) {
+      return item.nama === korlap;
+    });
+
+    if (!validKorlap) {
+      showNotification("Korlap tidak valid. Gunakan Korlap 1 sampai Korlap 5.", "warning");
+      return;
+    }
+
+    const success = addRegistration({
+      nama: nama,
+      korlap: korlap,
+      cabor: sport,
+      nomorRumah: nomorRumah,
+      sumber: "Tombol Cabor"
+    });
+
+    if (success) {
+      showNotification("✅ " + nama + " berhasil terdaftar di " + sport + ".", "success");
+    }
+  }
+
+  function loadRegistrations() {
+    const data = getRegistrations();
+
+    renderRegistrationDashboard(data);
+    renderPesertaList(data);
+    initLeaderboard();
+  }
+
+  function renderRegistrationDashboard(data) {
+    const container = el("registration-list");
+    if (!container) return;
+
+    if (!data.length) {
+      container.innerHTML = '<p class="empty-state">Belum ada pendaftaran. Klik tombol "Daftar" untuk mendaftar.</p>';
+      return;
+    }
+
+    container.innerHTML = data.map(function (item, index) {
+      return `
+        <div class="registration-item">
+          <div class="registration-item-info">
+            <span class="registration-item-badge">${escapeHtml(item.cabor)}</span>
+            <strong>${index + 1}. ${escapeHtml(item.nama)}</strong>
+            <small> | ${escapeHtml(item.korlap)} | Rumah: ${escapeHtml(item.nomorRumah || "-")}</small>
+          </div>
+          <button type="button" class="btn btn-small" onclick="removeRegistration(${item.id})">Hapus</button>
         </div>
-    </section>
+      `;
+    }).join("");
+  }
 
-    <!-- Countdown Section -->
-    <section id="countdown" class="countdown-section">
-        <div class="container">
-            <h2 class="section-title">Menuju 17 Agustus 2026</h2>
-            <div class="countdown-wrapper">
-                <div class="countdown-card glass">
-                    <div class="countdown-display">
-                        <div class="countdown-item">
-                            <span class="countdown-value" id="days">0</span>
-                            <p class="countdown-label">Hari</p>
-                        </div>
-                        <div class="countdown-item">
-                            <span class="countdown-value" id="hours">0</span>
-                            <p class="countdown-label">Jam</p>
-                        </div>
-                        <div class="countdown-item">
-                            <span class="countdown-value" id="minutes">0</span>
-                            <p class="countdown-label">Menit</p>
-                        </div>
-                        <div class="countdown-item">
-                            <span class="countdown-value" id="seconds">0</span>
-                            <p class="countdown-label">Detik</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="countdown-info glass">
-                    <p>📅 <strong>17 Agustus 2026</strong></p>
-                    <p>⏰ Pukul 07:00 - 17:00 WIB</p>
-                    <p>📍 Lapangan RT 007 RW 015</p>
-                </div>
-            </div>
+  function renderPesertaList(data) {
+    const container = el("pesertaList");
+    if (!container) return;
+
+    if (!data.length) {
+      container.innerHTML = '<div class="peserta-item">Belum ada peserta terdaftar.</div>';
+      return;
+    }
+
+    container.innerHTML = data.map(function (item, index) {
+      return `
+        <div class="peserta-item">
+          <strong>${index + 1}. ${escapeHtml(item.nama)}</strong>
+          <p>${escapeHtml(item.korlap)} — ${escapeHtml(item.cabor)}</p>
+          <small>Rumah: ${escapeHtml(item.nomorRumah || "-")} | ${escapeHtml(item.waktu)}</small>
         </div>
-    </section>
+      `;
+    }).join("");
+  }
 
-    <!-- Cabor Registration -->
-    <section id="cabor" class="cabor-section">
-        <div class="container">
-            <h2 class="section-title">Daftar Cabang Olahraga</h2>
-            <div class="cabor-grid">
-                <div class="cabor-card glass" data-sport="bulu-tangkis">
-                    <div class="cabor-icon">🏸</div>
-                    <h3>Bulu Tangkis</h3>
-                    <p>Kategori: Dewasa, Remaja</p>
-                    <button class="btn btn-small" onclick="registerCabor('Bulu Tangkis')">Daftar</button>
-                </div>
-                <div class="cabor-card glass" data-sport="voli">
-                    <div class="cabor-icon">🏐</div>
-                    <h3>Voli</h3>
-                    <p>Kategori: Dewasa, Pemuda</p>
-                    <button class="btn btn-small" onclick="registerCabor('Voli')">Daftar</button>
-                </div>
-                <div class="cabor-card glass" data-sport="futsal">
-                    <div class="cabor-icon">⚽</div>
-                    <h3>Futsal</h3>
-                    <p>Kategori: Senior, Junior</p>
-                    <button class="btn btn-small" onclick="registerCabor('Futsal')">Daftar</button>
-                </div>
-                <div class="cabor-card glass" data-sport="tenis-meja">
-                    <div class="cabor-icon">🏓</div>
-                    <h3>Tenis Meja</h3>
-                    <p>Kategori: Tunggal, Ganda</p>
-                    <button class="btn btn-small" onclick="registerCabor('Tenis Meja')">Daftar</button>
-                </div>
-                <div class="cabor-card glass" data-sport="catur">
-                    <div class="cabor-icon">♟️</div>
-                    <h3>Catur</h3>
-                    <p>Kategori: Terbuka</p>
-                    <button class="btn btn-small" onclick="registerCabor('Catur')">Daftar</button>
-                </div>
-                <div class="cabor-card glass" data-sport="estafet">
-                    <div class="cabor-icon">🏃</div>
-                    <h3>Lari Estafet</h3>
-                    <p>Kategori: Keluarga</p>
-                    <button class="btn btn-small" onclick="registerCabor('Lari Estafet')">Daftar</button>
-                </div>
-                <div class="cabor-card glass" data-sport="lomba-anak">
-                    <div class="cabor-icon">🎯</div>
-                    <h3>Lomba Anak</h3>
-                    <p>Kategori: 4-12 tahun</p>
-                    <button class="btn btn-small" onclick="registerCabor('Lomba Anak')">Daftar</button>
-                </div>
-                <div class="cabor-card glass" data-sport="senam">
-                    <div class="cabor-icon">💃</div>
-                    <h3>Senam Bersama</h3>
-                    <p>Kategori: Terbuka</p>
-                    <button class="btn btn-small" onclick="registerCabor('Senam')">Daftar</button>
-                </div>
-            </div>
+  function removeRegistration(id) {
+    const yakin = confirm("Hapus data peserta ini?");
+    if (!yakin) return;
 
-            <!-- Registration Dashboard -->
-            <div class="registration-dashboard glass">
-                <h3>📋 Pendaftaran Anda</h3>
-                <div id="registration-list" class="registration-list">
-                    <p class="empty-state">Belum ada pendaftaran. Klik tombol "Daftar" untuk mendaftar.</p>
-                </div>
-                <div class="registration-actions">
-                    <button class="btn btn-secondary" onclick="clearRegistrations()">Hapus Semua</button>
-                    <button class="btn btn-primary" onclick="exportRegistrations()">Unduh Data</button>
-                </div>
-            </div>
+    const filtered = getRegistrations().filter(function (item) {
+      return Number(item.id) !== Number(id);
+    });
+
+    saveRegistrations(filtered);
+    loadRegistrations();
+    showNotification("Data peserta berhasil dihapus.", "info");
+  }
+
+  function clearRegistrations() {
+    const yakin = confirm("Yakin hapus semua data peserta lokal di browser ini?");
+    if (!yakin) return;
+
+    localStorage.removeItem(STORAGE.registrations);
+    loadRegistrations();
+    showNotification("Semua data peserta lokal berhasil dihapus.", "info");
+  }
+
+  function exportRegistrations() {
+    const data = getRegistrations();
+
+    if (!data.length) {
+      showNotification("Belum ada data peserta untuk diunduh.", "warning");
+      return;
+    }
+
+    let csv = "No,Nama,Korlap,Cabang Lomba,Nomor Rumah,Sumber,Waktu Daftar\n";
+
+    data.forEach(function (item, index) {
+      csv += [
+        index + 1,
+        '"' + escapeCsv(item.nama) + '"',
+        '"' + escapeCsv(item.korlap) + '"',
+        '"' + escapeCsv(item.cabor) + '"',
+        '"' + escapeCsv(item.nomorRumah || "-") + '"',
+        '"' + escapeCsv(item.sumber || "Website") + '"',
+        '"' + escapeCsv(item.waktu) + '"'
+      ].join(",") + "\n";
+    });
+
+    downloadFile("data-peserta-hut-ri-81-rt007.csv", csv, "text/csv;charset=utf-8;");
+    showNotification("✅ Data peserta berhasil diunduh.", "success");
+  }
+
+  /* =========================
+     LEADERBOARD
+     ========================= */
+
+  function initLeaderboard() {
+    const registrations = getRegistrations();
+    const votes = getVotes();
+
+    const data = KORLAP_LIST.map(function (korlap) {
+      const peserta = registrations.filter(function (item) {
+        return item.korlap === korlap.nama;
+      }).length;
+
+      const totalVotes = votes.filter(function (item) {
+        return item.korlap === korlap.nama;
+      }).length;
+
+      return {
+        nama: korlap.nama,
+        kk: korlap.kk,
+        peserta: peserta,
+        votes: totalVotes,
+        score: peserta * 10 + totalVotes * 2
+      };
+    }).sort(function (a, b) {
+      return b.score - a.score;
+    });
+
+    renderLeaderboardMain(data);
+    renderLeaderboardPro(data);
+    renderStats(data);
+  }
+
+  function renderLeaderboardMain(data) {
+    const container = el("leaderboard-list");
+    if (!container) return;
+
+    container.innerHTML = data.map(function (item, index) {
+      const rank = index + 1;
+
+      return `
+        <div class="leaderboard-item">
+          <div class="rank-badge rank-${rank}">
+            ${rank}
+          </div>
+          <div class="leaderboard-info">
+            <strong>${escapeHtml(item.nama)}</strong>
+            <small>👥 ${item.kk} KK | 👤 ${item.peserta} Peserta | 🗳️ ${item.votes} Voting | 🏆 ${item.score} Poin</small>
+          </div>
         </div>
-    </section>
+      `;
+    }).join("");
+  }
 
-    <!-- Leaderboard -->
-    <section id="leaderboard" class="leaderboard-section">
-        <div class="container">
-            <h2 class="section-title">Leaderboard Korlap</h2>
-            <div class="leaderboard-wrapper">
-                <div class="leaderboard-card glass">
-                    <h3>🏆 Peringkat Korlap</h3>
-                    <div class="leaderboard-list" id="leaderboard-list">
-                        <!-- Filled by JavaScript -->
-                    </div>
-                </div>
-                <div class="leaderboard-stats glass">
-                    <h3>📊 Statistik Peserta</h3>
-                    <div class="stats-content" id="stats-content">
-                        <!-- Filled by JavaScript -->
-                    </div>
-                </div>
-            </div>
+  function renderLeaderboardPro(data) {
+    const container = el("leaderboardKorlap");
+    if (!container) return;
+
+    container.innerHTML = data.map(function (item, index) {
+      return `
+        <div class="leaderboard-item">
+          <strong>#${index + 1} ${escapeHtml(item.nama)}</strong>
+          <p>${item.kk} KK — ${item.peserta} peserta — ${item.votes} voting — ${item.score} poin</p>
         </div>
-    </section>
+      `;
+    }).join("");
+  }
 
-    <!-- Doorprize -->
-    <section id="doorprize" class="doorprize-section">
-        <div class="container">
-            <h2 class="section-title">Doorprize Random Draw</h2>
-            <div class="doorprize-wrapper">
-                <div class="doorprize-card glass">
-                    <h3>🎁 Hadiah Utama</h3>
-                    <div id="doorprize-display" class="doorprize-display">
-                        <p>Siapkan No. KTP Anda!</p>
-                    </div>
-                    <button class="btn btn-primary btn-large" onclick="drawDoorprize()">🎰 TARIK UNDIAN</button>
-                    <p class="doorprize-note">*Tekan tombol untuk random draw hadiah</p>
-                </div>
-                <div class="doorprize-list glass">
-                    <h3>📝 Hadiah Tersedia</h3>
-                    <ul>
-                        <li>🥇 <strong>Grand Prize:</strong> TV LED 55"</li>
-                        <li>🥈 <strong>1st Prize:</strong> Motor Vespa</li>
-                        <li>🥉 <strong>2nd Prize:</strong> Sepeda Motor 125cc</li>
-                        <li>🎯 <strong>3rd Prize:</strong> Kulkas 2 Pintu</li>
-                        <li>💝 <strong>4th Prize:</strong> Paket Liburan Keluarga</li>
-                        <li>🏅 <strong>5th Prize:</strong> Set Gadget Premium</li>
-                    </ul>
-                </div>
-            </div>
+  function renderStats(data) {
+    const stats = el("stats-content");
+    if (!stats) return;
+
+    const totalKK = data.reduce(function (sum, item) {
+      return sum + Number(item.kk || 0);
+    }, 0);
+
+    const totalPeserta = data.reduce(function (sum, item) {
+      return sum + Number(item.peserta || 0);
+    }, 0);
+
+    const totalPoin = data.reduce(function (sum, item) {
+      return sum + Number(item.score || 0);
+    }, 0);
+
+    stats.innerHTML = `
+      <div class="stat-item">
+        <div class="stat-value">${totalKK}</div>
+        <div class="stat-label">Total Kepala Keluarga</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">${totalPeserta}</div>
+        <div class="stat-label">Total Peserta Terdaftar</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">${totalPoin}</div>
+        <div class="stat-label">Total Poin Kompetisi</div>
+      </div>
+    `;
+  }
+
+  /* =========================
+     VOTING
+     ========================= */
+
+  function initVoting() {
+    const grid = el("voting-grid");
+    if (!grid) return;
+
+    grid.innerHTML = KORLAP_LIST.map(function (korlap) {
+      return `
+        <div class="voting-card" onclick="vote('${escapeHtml(korlap.nama)}')">
+          <h3>${escapeHtml(korlap.nama)}</h3>
+          <p>👥 ${korlap.kk} KK</p>
+          <button type="button" class="btn btn-small">Pilih</button>
         </div>
-    </section>
+      `;
+    }).join("");
 
-    <!-- Voting -->
-    <section id="voting" class="voting-section">
-        <div class="container">
-            <h2 class="section-title">Voting Warga</h2>
-            <div class="voting-wrapper">
-                <div class="voting-info glass">
-                    <h3>🗳️ Pilih Korlap Terbaik</h3>
-                    <p>Suarakan pilihan Anda untuk Korlap dengan penampilan terbaik!</p>
-                </div>
-                <div class="voting-grid" id="voting-grid">
-                    <!-- Filled by JavaScript -->
-                </div>
-                <div class="voting-result glass">
-                    <h3>📈 Hasil Voting Real-time</h3>
-                    <div id="voting-results">
-                        <!-- Filled by JavaScript -->
-                    </div>
-                </div>
+    updateVotingResults();
+  }
+
+  function vote(korlap) {
+    const data = getVotes();
+
+    data.push({
+      id: Date.now(),
+      korlap: korlap,
+      kategori: "Korlap Terbaik",
+      waktu: new Date().toLocaleString("id-ID")
+    });
+
+    saveVotes(data);
+    updateVotingResults();
+    initLeaderboard();
+
+    showNotification("✅ Terima kasih. Voting untuk " + korlap + " berhasil disimpan.", "success");
+  }
+
+  function updateVotingResults() {
+    const container = el("voting-results");
+    if (!container) return;
+
+    const votes = getVotes();
+    const total = votes.length;
+
+    const result = KORLAP_LIST.map(function (korlap) {
+      const count = votes.filter(function (item) {
+        return item.korlap === korlap.nama;
+      }).length;
+
+      return {
+        nama: korlap.nama,
+        count: count,
+        percent: total > 0 ? (count / total) * 100 : 0
+      };
+    }).sort(function (a, b) {
+      return b.count - a.count;
+    });
+
+    container.innerHTML = result.map(function (item) {
+      return `
+        <div class="voting-bar">
+          <span class="voting-label">${escapeHtml(item.nama)}</span>
+          <div class="voting-progress">
+            <div class="voting-progress-bar" style="width:${item.percent.toFixed(1)}%">
+              ${item.percent.toFixed(1)}%
             </div>
+          </div>
+          <span style="min-width:60px;text-align:right;font-weight:700;">${item.count} 🗳️</span>
         </div>
-    </section>
+      `;
+    }).join("");
+  }
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>SEMARAK AGUSTUS 2026</h4>
-                    <p>RT 007 RW 015 TCI 2</p>
-                    <p>Guyub, Sportif, Meriah, dan Digital</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Kontak</h4>
-                    <p>📍 Lapangan RT 007</p>
-                    <p>📅 17 Agustus 2026</p>
-                    <p>⏰ 07:00 - 17:00 WIB</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Menu</h4>
-                    <p><a href="hasil.html" style="color: var(--accent); text-decoration: none;">📊 Hasil Event</a></p>
-                    <p>🎉 Acara Meriah</p>
-                    <p>🏆 Kompetisi Seru</p>
-                </div>
+  /* =========================
+     DOORPRIZE
+     ========================= */
+
+  function drawDoorprize() {
+    const display = el("doorprize-display");
+    if (!display) return;
+
+    const peserta = getRegistrations();
+
+    const prizes = [
+      '🥇 Grand Prize: TV LED 55"',
+      "🥈 Hadiah 1: Sepeda",
+      "🥉 Hadiah 2: Kulkas 2 Pintu",
+      "🎯 Hadiah 3: Kompor Gas",
+      "💝 Hadiah 4: Paket Sembako",
+      "🏅 Hadiah 5: Voucher Belanja"
+    ];
+
+    display.classList.remove("winner");
+
+    let index = 0;
+    const spin = setInterval(function () {
+      display.innerHTML = `<strong>${prizes[index % prizes.length]}</strong><br><small>Mengundi...</small>`;
+      index++;
+    }, 90);
+
+    setTimeout(function () {
+      clearInterval(spin);
+
+      const prize = prizes[Math.floor(Math.random() * prizes.length)];
+      let winnerText = "";
+
+      if (peserta.length) {
+        const winner = peserta[Math.floor(Math.random() * peserta.length)];
+        winnerText = `
+          <strong>${escapeHtml(prize)}</strong><br>
+          <small>Pemenang: ${escapeHtml(winner.nama)} | ${escapeHtml(winner.korlap)} | ${escapeHtml(winner.cabor)}</small>
+        `;
+      } else {
+        const nomorKupon = "KPN-" + String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0");
+        winnerText = `
+          <strong>${escapeHtml(prize)}</strong><br>
+          <small>Nomor Kupon: ${nomorKupon}</small>
+        `;
+      }
+
+      display.innerHTML = winnerText;
+      display.classList.add("winner");
+
+      showConfetti();
+      showNotification("🎉 Doorprize berhasil diundi.", "success");
+    }, 2000);
+  }
+
+  /* =========================
+     LIVE SCORE / GALLERY / SPONSOR OPTIONAL
+     ========================= */
+
+  function initLiveScore() {
+    const wrapper = el("live-score-wrapper");
+    if (!wrapper) return;
+
+    const matches = [
+      { title: "Voli Bapak", team1: "Korlap 1", team2: "Korlap 3", score1: 0, score2: 0, status: "Terjadwal" },
+      { title: "Futsal Anak", team1: "Korlap 2", team2: "Korlap 4", score1: 0, score2: 0, status: "Terjadwal" },
+      { title: "Badminton", team1: "Korlap 5", team2: "Korlap 1", score1: 0, score2: 0, status: "Terjadwal" }
+    ];
+
+    wrapper.innerHTML = matches.map(function (match) {
+      return `
+        <div class="live-score-card live">
+          <div class="live-score-header">
+            <span class="live-score-title">${escapeHtml(match.title)}</span>
+            <span class="live-badge">${escapeHtml(match.status)}</span>
+          </div>
+          <div class="live-score-match">
+            <div>
+              <p class="team-name">${escapeHtml(match.team1)}</p>
+              <p class="team-score">${match.score1}</p>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 SEMARAK AGUSTUS - RT 007 RW 015 TCI 2. Semua Hak Dilindungi.</p>
+            <div class="vs">VS</div>
+            <div style="text-align:right;">
+              <p class="team-name">${escapeHtml(match.team2)}</p>
+              <p class="team-score">${match.score2}</p>
             </div>
+          </div>
         </div>
-    </footer>
+      `;
+    }).join("");
+  }
 
-    <!-- Confetti Container -->
-    <canvas id="confetti-canvas"></canvas>
+  function initGallery() {
+    const grid = el("gallery-grid");
+    if (!grid) return;
 
-    <!-- Scripts -->
-    <script src="data.js"></script>
-    <script src="script.js"></script>
-</body>
-</html>
+    const images = [
+      { title: "Pembukaan Acara", emoji: "🎉" },
+      { title: "Voli", emoji: "🏐" },
+      { title: "Futsal", emoji: "⚽" },
+      { title: "Badminton", emoji: "🏸" },
+      { title: "Mancing Mania", emoji: "🎣" },
+      { title: "Doorprize", emoji: "🎁" }
+    ];
+
+    grid.innerHTML = images.map(function (item) {
+      return `
+        <div class="gallery-item">
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--accent));font-size:64px;">
+            ${item.emoji}
+          </div>
+          <div class="gallery-overlay">
+            <p style="font-size:16px;font-weight:700;">${escapeHtml(item.title)}</p>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function initTVMode() {
+    let viewers = Math.floor(Math.random() * 200) + 50;
+    let duration = 0;
+
+    setInterval(function () {
+      const viewersEl = el("viewers-count");
+      const durationEl = el("duration");
+
+      if (!viewersEl || !durationEl) return;
+
+      viewers += Math.floor(Math.random() * 5) - 2;
+      viewers = Math.max(0, viewers);
+      viewersEl.textContent = viewers.toLocaleString("id-ID");
+
+      duration++;
+      const hours = String(Math.floor(duration / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((duration % 3600) / 60)).padStart(2, "0");
+      const seconds = String(duration % 60).padStart(2, "0");
+
+      durationEl.textContent = hours + ":" + minutes + ":" + seconds;
+    }, 1000);
+  }
+
+  function initSponsor() {
+    const grid = el("sponsor-grid");
+    if (!grid) return;
+
+    const sponsors = [
+      { name: "Sponsor Utama", icon: "🏢", type: "Sponsor" },
+      { name: "UMKM Makanan", icon: "🍜", type: "UMKM" },
+      { name: "UMKM Minuman", icon: "🥤", type: "UMKM" },
+      { name: "Donatur Warga", icon: "🤝", type: "Donatur" }
+    ];
+
+    grid.innerHTML = sponsors.map(function (sponsor) {
+      return `
+        <div class="sponsor-card glass">
+          <div class="sponsor-icon">${sponsor.icon}</div>
+          <h3>${escapeHtml(sponsor.name)}</h3>
+          <p>${escapeHtml(sponsor.type)}</p>
+        </div>
+      `;
+    }).join("");
+  }
+
+  /* =========================
+     PASSPORT OPTIONAL
+     ========================= */
+
+  function initPassport() {
+    loadPassportData();
+  }
+
+  function registerPassport() {
+    const name = el("passport-name") ? el("passport-name").value.trim() : "";
+    const ktp = el("passport-ktp") ? el("passport-ktp").value.trim() : "";
+    const email = el("passport-email") ? el("passport-email").value.trim() : "";
+    const phone = el("passport-phone") ? el("passport-phone").value.trim() : "";
+    const korlap = el("passport-korlap") ? normalizeKorlap(el("passport-korlap").value) : "";
+
+    if (!name || !ktp || !email || !phone || !korlap) {
+      showNotification("Mohon lengkapi semua field passport.", "warning");
+      return;
+    }
+
+    const data = {
+      name: name,
+      ktp: ktp,
+      email: email,
+      phone: phone,
+      korlap: korlap,
+      registrationDate: new Date().toLocaleDateString("id-ID")
+    };
+
+    localStorage.setItem(STORAGE.passport, JSON.stringify(data));
+    loadPassportData();
+
+    showNotification("✅ Passport warga berhasil dibuat.", "success");
+  }
+
+  function loadPassportData() {
+    const card = el("passport-card");
+    if (!card) return;
+
+    const data = safeJsonParse(localStorage.getItem(STORAGE.passport), null);
+
+    if (!data) {
+      card.innerHTML = '<p class="empty-state">Belum ada data passport.</p>';
+      return;
+    }
+
+    card.innerHTML = `
+      <div class="passport-card-display">
+        <h4>🎫 PASSPORT WARGA</h4>
+        <p class="name">${escapeHtml(data.name)}</p>
+        <p><strong>No. Identitas:</strong> ${escapeHtml(data.ktp)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(data.email)}</p>
+        <p><strong>Telepon:</strong> ${escapeHtml(data.phone)}</p>
+        <p><strong>Korlap:</strong> ${escapeHtml(data.korlap)}</p>
+        <p><strong>Tanggal Daftar:</strong> ${escapeHtml(data.registrationDate)}</p>
+        <button class="btn btn-secondary" onclick="clearPassport()" style="margin-top:15px;">Hapus Data</button>
+      </div>
+    `;
+  }
+
+  function clearPassport() {
+    localStorage.removeItem(STORAGE.passport);
+    loadPassportData();
+    showNotification("Data passport berhasil dihapus.", "info");
+  }
+
+  /* =========================
+     CERTIFICATE OPTIONAL
+     ========================= */
+
+  function initCertificate() {
+    // Optional. Akan aktif jika elemen sertifikat ada di HTML.
+  }
+
+  function generateCertificate() {
+    const name = el("cert-name") ? el("cert-name").value.trim() : "";
+    const category = el("cert-category") ? el("cert-category").value.trim() : "";
+    const display = el("certificate-display");
+
+    if (!display) return;
+
+    if (!name || !category) {
+      showNotification("Mohon isi nama dan kategori sertifikat.", "warning");
+      return;
+    }
+
+    display.innerHTML = `
+      <div class="certificate">
+        <div class="certificate-content">
+          <h2>SERTIFIKAT</h2>
+          <p>Ini menyatakan bahwa</p>
+          <div class="cert-name">${escapeHtml(name)}</div>
+          <p>Telah berpartisipasi sebagai</p>
+          <div class="cert-category">${escapeHtml(category)}</div>
+          <p style="font-weight:700;color:var(--primary);margin-top:20px;">
+            SEMARAK AGUSTUS 2026<br>HUT RI KE-81
+          </p>
+          <p>RT 007 RW 015 TCI 2</p>
+          <div class="cert-date">17 Agustus 2026</div>
+          <button class="btn btn-primary cert-print-btn" onclick="printCertificate()">🖨️ Cetak Sertifikat</button>
+        </div>
+      </div>
+    `;
+
+    showNotification("✅ Sertifikat berhasil dibuat.", "success");
+  }
+
+  function printCertificate() {
+    window.print();
+  }
+
+  /* =========================
+     CONFETTI & NOTIFICATION
+     ========================= */
+
+  function showConfetti() {
+    const canvas = el("confetti-canvas");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ["#DC143C", "#FFD700", "#FFFFFF"];
+    const particles = [];
+
+    for (let i = 0; i < 120; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        vx: (Math.random() - 0.5) * 8,
+        vy: Math.random() * 5 + 4,
+        size: Math.random() * 5 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(function (p, index) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.08;
+
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+
+        if (p.y > canvas.height) {
+          particles.splice(index, 1);
+        }
+      });
+
+      if (particles.length) {
+        requestAnimationFrame(animate);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    animate();
+  }
+
+  function injectNotificationStyle() {
+    if (document.getElementById("notification-style")) return;
+
+    const style = document.createElement("style");
+    style.id = "notification-style";
+    style.textContent = `
+      @keyframes hutriSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes hutriSlideDown {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(20px); }
+      }
+
+      .registration-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 14px;
+        background: rgba(220, 20, 60, 0.08);
+        margin-bottom: 10px;
+      }
+
+      .registration-item-info {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .registration-item-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #b00000;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .voting-bar {
+        display: grid;
+        grid-template-columns: 110px 1fr 60px;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .voting-progress {
+        height: 18px;
+        background: rgba(220, 20, 60, 0.12);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .voting-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #DC143C, #FFD700);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 800;
+        text-align: right;
+        padding-right: 8px;
+        line-height: 18px;
+        min-width: 28px;
+      }
+
+      @media (max-width: 700px) {
+        .registration-item {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .voting-bar {
+          grid-template-columns: 1fr;
+        }
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  function showNotification(message, type) {
+    const color = {
+      success: "#10b981",
+      warning: "#f59e0b",
+      danger: "#ef4444",
+      info: "#3b82f6"
+    }[type || "info"] || "#3b82f6";
+
+    const notification = document.createElement("div");
+    notification.style.cssText = `
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      max-width: 360px;
+      background: ${color};
+      color: white;
+      padding: 14px 20px;
+      border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      z-index: 10000;
+      font-weight: 700;
+      animation: hutriSlideUp .25s ease-out;
+    `;
+
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(function () {
+      notification.style.animation = "hutriSlideDown .25s ease-out";
+      setTimeout(function () {
+        notification.remove();
+      }, 250);
+    }, 2800);
+  }
+
+  /* =========================
+     GLOBAL FUNCTIONS UNTUK onclick HTML
+     ========================= */
+
+  window.registerCabor = registerCabor;
+  window.loadRegistrations = loadRegistrations;
+  window.removeRegistration = removeRegistration;
+  window.clearRegistrations = clearRegistrations;
+  window.exportRegistrations = exportRegistrations;
+  window.drawDoorprize = drawDoorprize;
+  window.vote = vote;
+  window.updateVotingResults = updateVotingResults;
+  window.registerPassport = registerPassport;
+  window.clearPassport = clearPassport;
+  window.generateCertificate = generateCertificate;
+  window.printCertificate = printCertificate;
+})();
