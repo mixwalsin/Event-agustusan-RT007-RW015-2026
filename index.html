@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEMARAK AGUSTUS 2026 - HUT RI KE-81 | RT 007 RW 015 TCI 2</title>
+    <meta name="description" content="Guyub, Sportif, Meriah, dan Digital - Event Agustusan Digital 2026 RT 007 RW 015">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23DC143C'>🇮🇩</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-text">🇮🇩 SEMARAK AGUSTUS 2026</span>
+                <p class="tagline">Guyub, Sportif, Meriah, dan Digital</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active">Beranda</a></li>
+                <li><a href="#countdown" class="nav-link">Countdown</a></li>
+                <li><a href="#cabor" class="nav-link">Cabor</a></li>
+                <li><a href="#leaderboard" class="nav-link">Leaderboard</a></li>
+                <li><a href="#doorprize" class="nav-link">Doorprize</a></li>
+                <li><a href="#voting" class="nav-link">Voting</a></li>
+                <li><a href="hasil.html" class="nav-link">Hasil Event</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-background">
+            <div class="hero-blob hero-blob-1"></div>
+            <div class="hero-blob hero-blob-2"></div>
+        </div>
+        <div class="container hero-content">
+            <h1 class="hero-title">SEMARAK AGUSTUS 2026</h1>
+            <p class="hero-subtitle">HUT RI KE-81</p>
+            <p class="hero-desc">RT 007 RW 015 TCI 2</p>
+            <p class="hero-tagline">Guyub • Sportif • Meriah • Digital</p>
+            <div class="hero-buttons">
+                <a href="#cabor" class="btn btn-primary">Daftar Cabor</a>
+                <a href="#voting" class="btn btn-secondary">Ikuti Voting</a>
+                <a href="hasil.html" class="btn btn-accent">📊 LIHAT HASIL EVENT</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Countdown Section -->
+    <section id="countdown" class="countdown-section">
+        <div class="container">
+            <h2 class="section-title">Menuju 17 Agustus 2026</h2>
+            <div class="countdown-wrapper">
+                <div class="countdown-card glass">
+                    <div class="countdown-display">
+                        <div class="countdown-item">
+                            <span class="countdown-value" id="days">0</span>
+                            <p class="countdown-label">Hari</p>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-value" id="hours">0</span>
+                            <p class="countdown-label">Jam</p>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-value" id="minutes">0</span>
+                            <p class="countdown-label">Menit</p>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-value" id="seconds">0</span>
+                            <p class="countdown-label">Detik</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="countdown-info glass">
+                    <p>📅 <strong>17 Agustus 2026</strong></p>
+                    <p>⏰ Pukul 07:00 - 17:00 WIB</p>
+                    <p>📍 Lapangan RT 007 RW 015</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cabor Registration -->
+    <section id="cabor" class="cabor-section">
+        <div class="container">
+            <h2 class="section-title">Daftar Cabang Olahraga</h2>
+            <div class="cabor-grid">
+                <div class="cabor-card glass" data-sport="bulu-tangkis">
+                    <div class="cabor-icon">🏸</div>
+                    <h3>Bulu Tangkis</h3>
+                    <p>Kategori: Dewasa, Remaja</p>
+                    <button class="btn btn-small" onclick="registerCabor('Bulu Tangkis')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="voli">
+                    <div class="cabor-icon">🏐</div>
+                    <h3>Voli</h3>
+                    <p>Kategori: Dewasa, Pemuda</p>
+                    <button class="btn btn-small" onclick="registerCabor('Voli')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="futsal">
+                    <div class="cabor-icon">⚽</div>
+                    <h3>Futsal</h3>
+                    <p>Kategori: Senior, Junior</p>
+                    <button class="btn btn-small" onclick="registerCabor('Futsal')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="tenis-meja">
+                    <div class="cabor-icon">🏓</div>
+                    <h3>Tenis Meja</h3>
+                    <p>Kategori: Tunggal, Ganda</p>
+                    <button class="btn btn-small" onclick="registerCabor('Tenis Meja')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="catur">
+                    <div class="cabor-icon">♟️</div>
+                    <h3>Catur</h3>
+                    <p>Kategori: Terbuka</p>
+                    <button class="btn btn-small" onclick="registerCabor('Catur')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="estafet">
+                    <div class="cabor-icon">🏃</div>
+                    <h3>Lari Estafet</h3>
+                    <p>Kategori: Keluarga</p>
+                    <button class="btn btn-small" onclick="registerCabor('Lari Estafet')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="lomba-anak">
+                    <div class="cabor-icon">🎯</div>
+                    <h3>Lomba Anak</h3>
+                    <p>Kategori: 4-12 tahun</p>
+                    <button class="btn btn-small" onclick="registerCabor('Lomba Anak')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="senam">
+                    <div class="cabor-icon">💃</div>
+                    <h3>Senam Bersama</h3>
+                    <p>Kategori: Terbuka</p>
+                    <button class="btn btn-small" onclick="registerCabor('Senam')">Daftar</button>
+                </div>
+            </div>
+
+            <!-- Registration Dashboard -->
+            <div class="registration-dashboard glass">
+                <h3>📋 Pendaftaran Anda</h3>
+                <div id="registration-list" class="registration-list">
+                    <p class="empty-state">Belum ada pendaftaran. Klik tombol "Daftar" untuk mendaftar.</p>
+                </div>
+                <div class="registration-actions">
+                    <button class="btn btn-secondary" onclick="clearRegistrations()">Hapus Semua</button>
+                    <button class="btn btn-primary" onclick="exportRegistrations()">Unduh Data</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard -->
+    <section id="leaderboard" class="leaderboard-section">
+        <div class="container">
+            <h2 class="section-title">Leaderboard Korlap</h2>
+            <div class="leaderboard-wrapper">
+                <div class="leaderboard-card glass">
+                    <h3>🏆 Peringkat Korlap</h3>
+                    <div class="leaderboard-list" id="leaderboard-list">
+                        <!-- Filled by JavaScript -->
+                    </div>
+                </div>
+                <div class="leaderboard-stats glass">
+                    <h3>📊 Statistik Peserta</h3>
+                    <div class="stats-content" id="stats-content">
+                        <!-- Filled by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Doorprize -->
+    <section id="doorprize" class="doorprize-section">
+        <div class="container">
+            <h2 class="section-title">Doorprize Random Draw</h2>
+            <div class="doorprize-wrapper">
+                <div class="doorprize-card glass">
+                    <h3>🎁 Hadiah Utama</h3>
+                    <div id="doorprize-display" class="doorprize-display">
+                        <p>Siapkan No. KTP Anda!</p>
+                    </div>
+                    <button class="btn btn-primary btn-large" onclick="drawDoorprize()">🎰 TARIK UNDIAN</button>
+                    <p class="doorprize-note">*Tekan tombol untuk random draw hadiah</p>
+                </div>
+                <div class="doorprize-list glass">
+                    <h3>📝 Hadiah Tersedia</h3>
+                    <ul>
+                        <li>🥇 <strong>Grand Prize:</strong> TV LED 55"</li>
+                        <li>🥈 <strong>1st Prize:</strong> Motor Vespa</li>
+                        <li>🥉 <strong>2nd Prize:</strong> Sepeda Motor 125cc</li>
+                        <li>🎯 <strong>3rd Prize:</strong> Kulkas 2 Pintu</li>
+                        <li>💝 <strong>4th Prize:</strong> Paket Liburan Keluarga</li>
+                        <li>🏅 <strong>5th Prize:</strong> Set Gadget Premium</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Voting -->
+    <section id="voting" class="voting-section">
+        <div class="container">
+            <h2 class="section-title">Voting Warga</h2>
+            <div class="voting-wrapper">
+                <div class="voting-info glass">
+                    <h3>🗳️ Pilih Korlap Terbaik</h3>
+                    <p>Suarakan pilihan Anda untuk Korlap dengan penampilan terbaik!</p>
+                </div>
+                <div class="voting-grid" id="voting-grid">
+                    <!-- Filled by JavaScript -->
+                </div>
+                <div class="voting-result glass">
+                    <h3>📈 Hasil Voting Real-time</h3>
+                    <div id="voting-results">
+                        <!-- Filled by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>SEMARAK AGUSTUS 2026</h4>
+                    <p>RT 007 RW 015 TCI 2</p>
+                    <p>Guyub, Sportif, Meriah, dan Digital</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Kontak</h4>
+                    <p>📍 Lapangan RT 007</p>
+                    <p>📅 17 Agustus 2026</p>
+                    <p>⏰ 07:00 - 17:00 WIB</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Menu</h4>
+                    <p><a href="hasil.html" style="color: var(--accent); text-decoration: none;">📊 Hasil Event</a></p>
+                    <p>🎉 Acara Meriah</p>
+                    <p>🏆 Kompetisi Seru</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SEMARAK AGUSTUS - RT 007 RW 015 TCI 2. Semua Hak Dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Confetti Container -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
