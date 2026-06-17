@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event TV - Event Agustusan 2026</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="event-tv-page">
+    <!-- HEADER TV -->
+    <header class="event-tv-header">
+        <div class="event-tv-logo">
+            <img src="assets/logo/logo.png" alt="Logo" class="logo">
+            <h1>🎉 Event Agustusan 2026</h1>
+        </div>
+        <div class="event-tv-status">
+            <span id="tvStatus" class="status-badge">BERLANGSUNG</span>
+            <span id="tvTime" class="time-display">00:00:00</span>
+        </div>
+    </header>
+
+    <div class="event-tv-container">
+        <!-- MAIN DISPLAY (LEADERBOARD / PERTANDINGAN) -->
+        <section class="event-tv-main">
+            <div id="tvContent" class="tv-content">
+                <!-- Konten dinamis dari tv.js -->
+            </div>
+        </section>
+
+        <!-- SIDEBAR INFORMASI -->
+        <aside class="event-tv-sidebar">
+            <!-- LIVE SCOREBOARD -->
+            <div class="tv-widget">
+                <h3>🔴 LIVE SKOR</h3>
+                <div id="tvLiveScore" class="live-score-display">
+                    <!-- Di-update real-time dari tv.js -->
+                </div>
+            </div>
+
+            <!-- JADWAL HARI INI -->
+            <div class="tv-widget">
+                <h3>📅 JADWAL HARI INI</h3>
+                <div id="tvJadwal" class="tv-jadwal-list">
+                    <!-- Di-generate dari data.js -->
+                </div>
+            </div>
+
+            <!-- TOP 3 LEADERBOARD -->
+            <div class="tv-widget">
+                <h3>🏆 TOP 3</h3>
+                <div id="tvTop3" class="tv-top3">
+                    <!-- Di-generate dari data.js -->
+                </div>
+            </div>
+
+            <!-- COUNTDOWN NEXT EVENT -->
+            <div class="tv-widget">
+                <h3>⏱️ NEXT EVENT</h3>
+                <div id="tvNextCountdown" class="tv-countdown">
+                    <!-- Di-update dari tv.js -->
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- BOTTOM TICKER -->
+    <footer class="event-tv-ticker">
+        <div class="ticker-content" id="tvTicker">
+            <!-- Running text dari tv.js -->
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/tv.js"></script>
+</body>
+</html>
