@@ -7,7 +7,28 @@
 // ISI DENGAN KREDENSIAL PROYEK SUPABASE ANDA SECARA BENAR
 const SUPABASE_URL = "https://tjrqubmjndqxlwcrrszl.supabase.co"; // Diambil dari subdomain URL Anda di screenshot
 const SUPABASE_KEY = "tjrqubmjndgxlwcrrszl";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : {
+    from: () => ({
+        insert: async () => ({ data: [], error: null }),
+        select: () => ({
+            eq: () => ({
+                order: async () => ({ data: [], error: null })
+            }),
+            order: async () => ({ data: [], error: null })
+        })
+    })
+};
+// ======== UTILITY FUNCTIONS ========
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initResultsDisplay();
@@ -121,18 +142,18 @@ function initResultsDisplay() {
     resultsGrid.innerHTML = matches.map(match => `
         <div class="hasil-card glass">
             <div class="hasil-header">
-                <h3>${match.icon} ${match.cabor}</h3>
-                <span class="badge-status badge-selesai">${match.status}</span>
+                <h3>${escapeHTML(match.icon)} ${escapeHTML(match.cabor)}</h3>
+                <span class="badge-status badge-selesai">${escapeHTML(match.status)}</span>
             </div>
             <div class="hasil-match">
                 <div class="tim">
-                    <p class="tim-nama">${match.teamA}</p>
-                    <p class="tim-score">${match.scoreA}</p>
+                    <p class="tim-nama">${escapeHTML(match.teamA)}</p>
+                    <p class="tim-score">${escapeHTML(match.scoreA)}</p>
                 </div>
                 <div class="vs">VS</div>
                 <div class="tim" style="text-align: right;">
-                    <p class="tim-nama">${match.teamB}</p>
-                    <p class="tim-score">${match.scoreB}</p>
+                    <p class="tim-nama">${escapeHTML(match.teamB)}</p>
+                    <p class="tim-score">${escapeHTML(match.scoreB)}</p>
                 </div>
             </div>
         </div>

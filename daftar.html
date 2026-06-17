@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran Peserta - SEMARAK AGUSTUS 2026 | RT 007 RW 015 TCI 2</title>
+    <meta name="description" content="Pendaftaran Peserta Cabang Olahraga Event Agustusan Digital 2026 RT 007 RW 015">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23DC143C'>🇮🇩</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-text">🇮🇩 SEMARAK AGUSTUS 2026</span>
+                <p class="tagline">Guyub, Sportif, Meriah, dan Digital</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Beranda</a></li>
+                <li><a href="daftar.html" class="nav-link active">Pendaftaran</a></li>
+                <li><a href="hasil.html" class="nav-link">Hasil Event</a></li>
+                <li><a href="galeri.html" class="nav-link">Galeri</a></li>
+                <li><a href="event-tv.html" class="nav-link">Live TV</a></li>
+                <li><a href="admin.html" class="nav-link">Admin Panel</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Hero -->
+    <section class="hasil-hero" style="background: linear-gradient(135deg, var(--primary), var(--dark)); min-height: 40vh; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--light); padding-top: 100px;">
+        <div class="container">
+            <h1 class="hasil-title">PENDAFTARAN PESERTA</h1>
+            <p class="hasil-subtitle">Daftarkan Diri Anda di Cabang Olahraga Favorit</p>
+            <p class="hasil-desc">RT 007 RW 015 TCI 2</p>
+        </div>
+    </section>
+
+    <!-- Cabor Registration -->
+    <section id="cabor" class="cabor-section">
+        <div class="container">
+            <h2 class="section-title">Pilih Cabang Olahraga</h2>
+            <div class="cabor-grid">
+                <div class="cabor-card glass" data-sport="bulu-tangkis">
+                    <div class="cabor-icon">🏸</div>
+                    <h3>Bulu Tangkis</h3>
+                    <p>Kategori: Dewasa, Remaja</p>
+                    <button class="btn btn-small" onclick="registerCabor('Bulu Tangkis')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="voli">
+                    <div class="cabor-icon">🏐</div>
+                    <h3>Voli</h3>
+                    <p>Kategori: Dewasa, Pemuda</p>
+                    <button class="btn btn-small" onclick="registerCabor('Voli')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="futsal">
+                    <div class="cabor-icon">⚽</div>
+                    <h3>Futsal</h3>
+                    <p>Kategori: Senior, Junior</p>
+                    <button class="btn btn-small" onclick="registerCabor('Futsal')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="tenis-meja">
+                    <div class="cabor-icon">🏓</div>
+                    <h3>Tenis Meja</h3>
+                    <p>Kategori: Tunggal, Ganda</p>
+                    <button class="btn btn-small" onclick="registerCabor('Tenis Meja')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="catur">
+                    <div class="cabor-icon">♟️</div>
+                    <h3>Catur</h3>
+                    <p>Kategori: Terbuka</p>
+                    <button class="btn btn-small" onclick="registerCabor('Catur')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="estafet">
+                    <div class="cabor-icon">🏃</div>
+                    <h3>Lari Estafet</h3>
+                    <p>Kategori: Keluarga</p>
+                    <button class="btn btn-small" onclick="registerCabor('Lari Estafet')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="lomba-anak">
+                    <div class="cabor-icon">🎯</div>
+                    <h3>Lomba Anak</h3>
+                    <p>Kategori: 4-12 tahun</p>
+                    <button class="btn btn-small" onclick="registerCabor('Lomba Anak')">Daftar</button>
+                </div>
+                <div class="cabor-card glass" data-sport="senam">
+                    <div class="cabor-icon">💃</div>
+                    <h3>Senam Bersama</h3>
+                    <p>Kategori: Terbuka</p>
+                    <button class="btn btn-small" onclick="registerCabor('Senam')">Daftar</button>
+                </div>
+            </div>
+
+            <!-- Registration Dashboard -->
+            <div class="registration-dashboard glass" style="margin-top: 50px;">
+                <h3>📋 Pendaftaran Warga Terkini</h3>
+                <div id="registration-list" class="registration-list">
+                    <p class="empty-state">Belum ada pendaftaran. Klik tombol "Daftar" untuk mendaftar.</p>
+                </div>
+                <div class="registration-actions">
+                    <button class="btn btn-secondary" onclick="clearRegistrations()">Hapus Semua</button>
+                    <button class="btn btn-primary" onclick="exportRegistrations()">Unduh Data</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>SEMARAK AGUSTUS 2026</h4>
+                    <p>RT 007 RW 015 TCI 2</p>
+                    <p>Guyub, Sportif, Meriah, dan Digital</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Kontak</h4>
+                    <p>📍 Lapangan RT 007</p>
+                    <p>📅 17 Agustus 2026</p>
+                    <p>⏰ 07:00 - 17:00 WIB</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Menu</h4>
+                    <p><a href="index.html" style="color: var(--accent); text-decoration: none;">← Kembali ke Beranda</a></p>
+                    <p>🎉 Acara Meriah</p>
+                    <p>🏆 Kompetisi Seru</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SEMARAK AGUSTUS - RT 007 RW 015 TCI 2. Semua Hak Dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
