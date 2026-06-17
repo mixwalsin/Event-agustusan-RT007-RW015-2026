@@ -424,7 +424,7 @@ function startRefreshTimer() {
     clearInterval(refreshTimer);
     refreshTimer = setInterval(() => {
         secondsLeft--;
-        document.getElementById('next-refresh').textContent = `Refresh dalam ${secondsLeft}d`;
+        document.getElementById('next-refresh').textContent = `Refresh dalam ${secondsLeft} detik`;
         if (secondsLeft <= 0) {
             loadAll();
             secondsLeft = REFRESH_INTERVAL / 1000;

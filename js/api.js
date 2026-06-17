@@ -3,12 +3,19 @@
    Frontend wrapper untuk API Backend PHP
    SEMARAK AGUSTUS 2026 – RT 007 RW 015 TCI 2
    ============================================================
-   Ubah API_BASE_URL sesuai lingkungan:
-     - Lokal (XAMPP) : "http://localhost/Event-agustusan-RT007-RW015-2026/api"
-     - cPanel hosting : "https://yourdomain.com/api"
+   API_BASE_URL akan otomatis dipilih berdasarkan hostname:
+     - Jika diakses dari localhost/127.0.0.1 → gunakan URL lokal XAMPP
+     - Jika diakses dari GitHub Pages → gunakan URL hosting (ubah sesuai server)
    ============================================================ */
 
-const API_BASE_URL = "http://localhost/Event-agustusan-RT007-RW015-2026/api";
+const API_BASE_URL = (() => {
+    const h = window.location.hostname;
+    if (h === 'localhost' || h === '127.0.0.1') {
+        return 'http://localhost/Event-agustusan-RT007-RW015-2026/api';
+    }
+    // TODO: Ganti URL di bawah dengan URL hosting cPanel Anda setelah deploy
+    return 'https://yourdomain.com/api';
+})();
 
 // ---- Helper fetch dengan timeout & fallback -------------------------
 async function apiFetch(endpoint, options = {}) {

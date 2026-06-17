@@ -12,7 +12,7 @@ define('DB_HOST', 'localhost');
 define('DB_PORT', '3306');
 define('DB_NAME', 'agustusan_rt007_2026');
 define('DB_USER', 'root');
-define('DB_PASS', '');          // Sesuaikan password MySQL XAMPP Anda
+define('DB_PASS', '');          // Sesuaikan password MySQL XAMPP Anda (WAJIB diganti di production!)
 define('DB_CHARSET', 'utf8mb4');
 
 // ---- CORS Header -----------------------------------------------------------
@@ -27,9 +27,8 @@ function setCorsHeaders(): void
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
     if (in_array($origin, $allowedOrigins, true)) {
         header("Access-Control-Allow-Origin: {$origin}");
-    } else {
-        header('Access-Control-Allow-Origin: *');
     }
+    // Origin yang tidak dikenali tidak mendapat CORS header (request akan diblokir browser)
 
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
@@ -98,8 +97,9 @@ function logAktivitas(string $aksi, string $keterangan = ''): void
             'INSERT INTO log_aktivitas (aksi, keterangan, ip_address, user_agent) VALUES (?, ?, ?, ?)'
         );
         $stmt->execute([$aksi, $keterangan, $ip, $ua]);
-    } catch (Throwable) {
-        // Jangan hentikan eksekusi hanya karena log gagal
+    } catch (Throwable $e) {
+        // Jangan hentikan eksekusi hanya karena log gagal; catat ke error_log untuk diagnosis
+        error_log('[logAktivitas] Gagal menyimpan log: ' . $e->getMessage());
     }
 }
 

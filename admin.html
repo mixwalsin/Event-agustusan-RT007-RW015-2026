@@ -87,14 +87,14 @@
 
     <!-- Tabs -->
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('peserta')">👥 Peserta</button>
-        <button class="tab-btn" onclick="switchTab('skor')">🏅 Skor</button>
-        <button class="tab-btn" onclick="switchTab('jadwal')">📅 Jadwal</button>
-        <button class="tab-btn" onclick="switchTab('juara')">🏆 Juara</button>
-        <button class="tab-btn" onclick="switchTab('doorprize')">🎁 Doorprize</button>
-        <button class="tab-btn" onclick="switchTab('sponsor')">🏢 Sponsor</button>
-        <button class="tab-btn" onclick="switchTab('pengumuman')">📢 Pengumuman</button>
-        <button class="tab-btn" onclick="switchTab('leaderboard')">📊 Leaderboard</button>
+        <button class="tab-btn active" onclick="switchTab('peserta', event)">👥 Peserta</button>
+        <button class="tab-btn" onclick="switchTab('skor', event)">🏅 Skor</button>
+        <button class="tab-btn" onclick="switchTab('jadwal', event)">📅 Jadwal</button>
+        <button class="tab-btn" onclick="switchTab('juara', event)">🏆 Juara</button>
+        <button class="tab-btn" onclick="switchTab('doorprize', event)">🎁 Doorprize</button>
+        <button class="tab-btn" onclick="switchTab('sponsor', event)">🏢 Sponsor</button>
+        <button class="tab-btn" onclick="switchTab('pengumuman', event)">📢 Pengumuman</button>
+        <button class="tab-btn" onclick="switchTab('leaderboard', event)">📊 Leaderboard</button>
     </div>
 
     <!-- ========== PESERTA ========== -->
@@ -366,11 +366,11 @@ async function initPanel() {
 }
 
 // ---- TABS ---------------------------------------------------
-function switchTab(name) {
+function switchTab(name, evt) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
-    event.currentTarget.classList.add('active');
+    if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
 }
 
 // ---- HELPERS ------------------------------------------------

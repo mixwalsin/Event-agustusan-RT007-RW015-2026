@@ -526,14 +526,15 @@ Semua API mengembalikan JSON dengan format:
 
 ### 6. Cara Ubah API_BASE_URL untuk Hosting
 
-Edit file `js/api.js`, baris pertama:
+File `js/api.js` secara **otomatis** memilih URL berdasarkan hostname:
+- Jika diakses dari `localhost` atau `127.0.0.1` → gunakan URL XAMPP lokal
+- Jika diakses dari domain lain (GitHub Pages, dsb.) → gunakan URL hosting
+
+Untuk mengaktifkan URL hosting, ubah baris berikut di `js/api.js`:
 
 ```javascript
-// Lokal (XAMPP):
-const API_BASE_URL = "http://localhost/Event-agustusan-RT007-RW015-2026/api";
-
-// cPanel / Shared Hosting:
-const API_BASE_URL = "https://yourdomain.com/api";
+// Ubah URL ini sesuai domain cPanel Anda:
+return 'https://yourdomain.com/api';
 ```
 
 ### 7. Cara Upload Backend ke cPanel
