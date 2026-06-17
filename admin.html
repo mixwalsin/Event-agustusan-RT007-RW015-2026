@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Event Agustusan 2026</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-page">
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <h1>🔐 Panel Panitia</h1>
+            </div>
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
+            <button class="sidebar-btn active" onclick="showSection('dashboard')">📊 Dashboard</button>
+            <button class="sidebar-btn" onclick="showSection('peserta')">👥 Kelola Peserta</button>
+            <button class="sidebar-btn" onclick="showSection('skor')">🏅 Input Skor</button>
+            <button class="sidebar-btn" onclick="showSection('jadwal')">📅 Jadwal</button>
+            <button class="sidebar-btn" onclick="showSection('doorprize')">🎁 Doorprize</button>
+            <button class="sidebar-btn" onclick="showSection('voting')">⭐ Voting</button>
+            <button class="sidebar-btn" onclick="showSection('settings')">⚙️ Pengaturan</button>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-content">
+            <!-- DASHBOARD -->
+            <section id="dashboard" class="admin-section active">
+                <h2>Dashboard Panitia</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Peserta</h3>
+                        <p class="stat-number" id="statPeserta">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Cabor Terdaftar</h3>
+                        <p class="stat-number" id="statCabor">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Vote</h3>
+                        <p class="stat-number" id="statVote">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Status Event</h3>
+                        <p class="stat-status" id="statStatus">Persiapan</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- KELOLA PESERTA -->
+            <section id="peserta" class="admin-section">
+                <h2>Kelola Peserta</h2>
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>Cabor</th>
+                                <th>Kelompok</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pesertaTable">
+                            <!-- Di-generate dari data.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- INPUT SKOR -->
+            <section id="skor" class="admin-section">
+                <h2>Input Skor Pertandingan</h2>
+                <form class="admin-form" onsubmit="inputSkor(event)">
+                    <div class="form-group">
+                        <label>Cabor:</label>
+                        <select id="caborSelect" required>
+                            <option>-- Pilih Cabor --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Peserta:</label>
+                        <select id="pesertaSelect" required>
+                            <option>-- Pilih Peserta --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Skor:</label>
+                        <input type="number" id="skorInput" min="0" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan Skor</button>
+                </form>
+                <div id="skorMessage" class="message"></div>
+            </section>
+
+            <!-- JADWAL -->
+            <section id="jadwal" class="admin-section">
+                <h2>Manajemen Jadwal</h2>
+                <form class="admin-form" onsubmit="addJadwal(event)">
+                    <div class="form-group">
+                        <label>Waktu:</label>
+                        <input type="datetime-local" id="jadwalWaktu" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kegiatan:</label>
+                        <input type="text" id="jadwalKegiatan" placeholder="Misal: Pembukaan, Lomba Futsal" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Tambah Jadwal</button>
+                </form>
+                <div id="jadwalList" class="admin-list">
+                    <!-- Di-generate dari data.js -->
+                </div>
+            </section>
+
+            <!-- DOORPRIZE -->
+            <section id="doorprize" class="admin-section">
+                <h2>Manajemen Doorprize</h2>
+                <form class="admin-form" onsubmit="addDoorprize(event)">
+                    <div class="form-group">
+                        <label>Hadiah:</label>
+                        <input type="text" id="doorprizeNama" placeholder="Misal: TV, Speaker" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah:</label>
+                        <input type="number" id="doorprizeJumlah" min="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Tambah Doorprize</button>
+                </form>
+                <div id="doorprizeList" class="admin-list">
+                    <!-- Di-generate dari data.js -->
+                </div>
+            </section>
+
+            <!-- VOTING -->
+            <section id="voting" class="admin-section">
+                <h2>Data Voting</h2>
+                <div id="votingStats" class="voting-stats">
+                    <!-- Di-generate dari data.js -->
+                </div>
+            </section>
+
+            <!-- SETTINGS -->
+            <section id="settings" class="admin-section">
+                <h2>Pengaturan Event</h2>
+                <form class="admin-form" onsubmit="saveSettings(event)">
+                    <div class="form-group">
+                        <label>Nama Event:</label>
+                        <input type="text" id="settingNamaEvent" value="Event Agustusan 2026" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Event:</label>
+                        <input type="date" id="settingTanggalEvent" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Status Event:</label>
+                        <select id="settingStatusEvent">
+                            <option>Persiapan</option>
+                            <option>Berlangsung</option>
+                            <option>Selesai</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

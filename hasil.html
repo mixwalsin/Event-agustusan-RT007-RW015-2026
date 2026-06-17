@@ -3,206 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HASIL EVENT AGUSTUS 2026 - HUT RI KE-81 | RT 007 RW 015 TCI 2</title>
-    <meta name="description" content="Hasil Event Agustusan Digital 2026 - RT 007 RW 015 TCI 2">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23DC143C'>🇮🇩</text></svg>">
+    <title>Hasil Event - Event Agustusan 2026</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
-            <div class="logo">
-                <span class="logo-text">🇮🇩 HASIL AGUSTUS 2026</span>
-                <p class="tagline">Guyub, Sportif, Meriah, dan Digital</p>
+            <div class="navbar-brand">
+                <h1>🏆 Hasil Event</h1>
             </div>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">← Kembali ke Beranda</a></li>
-                <li><a href="#results" class="nav-link active">Hasil</a></li>
-                <li><a href="#klasemen" class="nav-link">Klasemen</a></li>
-                <li><a href="#juara" class="nav-link">Juara</a></li>
-                <li><a href="#doorprize" class="nav-link">Doorprize</a></li>
-                <li><a href="#galeri" class="nav-link">Galeri</a></li>
-            </ul>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            <a href="index.html" class="btn btn-secondary">← Kembali ke Beranda</a>
         </div>
     </nav>
 
-    <!-- Header Hero -->
-    <section class="hasil-hero">
-        <div class="container hasil-hero-content">
-            <h1 class="hasil-title">HASIL EVENT AGUSTUS 2026</h1>
-            <p class="hasil-subtitle">HUT RI KE-81</p>
-            <p class="hasil-desc">RT 007 RW 015 TCI 2</p>
-            <p class="hasil-tagline">Terima Kasih atas Partisipasinya!</p>
-        </div>
-    </section>
+    <div class="container hasil-container">
+        <!-- FILTER CABOR -->
+        <section class="filter-section">
+            <label for="filterCabor">Filter Cabor:</label>
+            <select id="filterCabor" onchange="filterByCabor()">
+                <option value="">-- Semua Cabor --</option>
+            </select>
+        </section>
 
-    <!-- Hasil Pertandingan -->
-    <section id="results" class="results-section">
-        <div class="container">
-            <h2 class="section-title">🏅 Hasil Pertandingan</h2>
-            <div class="results-grid" id="results-grid">
-                <!-- Filled by JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Klasemen Korlap -->
-    <section id="klasemen" class="klasemen-section">
-        <div class="container">
-            <h2 class="section-title">🏆 Klasemen Korlap (Asian Games Style)</h2>
-            <div class="klasemen-wrapper">
-                <table class="klasemen-table glass">
+        <!-- LEADERBOARD LENGKAP -->
+        <section class="leaderboard-full">
+            <h2>Leaderboard Lengkap</h2>
+            <div class="leaderboard-table-container">
+                <table class="leaderboard-table">
                     <thead>
                         <tr>
                             <th>Peringkat</th>
-                            <th>Korlap</th>
-                            <th>👑 Emas</th>
-                            <th>🥈 Perak</th>
-                            <th>🥉 Perunggu</th>
-                            <th>Total Poin</th>
+                            <th>Nama Peserta</th>
+                            <th>Cabor</th>
+                            <th>Kelompok</th>
+                            <th>Total Skor</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="klasemen-table-body">
-                        <!-- Filled by JavaScript -->
+                    <tbody id="leaderboardTable">
+                        <!-- Di-generate dari data.js -->
                     </tbody>
                 </table>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Daftar Juara -->
-    <section id="juara" class="juara-section">
-        <div class="container">
-            <h2 class="section-title">🥇 Daftar Juara Cabang Lomba</h2>
-            <div class="juara-grid" id="juara-grid">
-                <!-- Filled by JavaScript -->
+        <!-- JUARA PER CABOR -->
+        <section class="juara-section">
+            <h2>🥇 Juara Per Cabor</h2>
+            <div class="juara-grid" id="juaraGrid">
+                <!-- Di-generate dari data.js -->
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Doorprize Winners -->
-    <section id="doorprize" class="doorprize-results-section">
-        <div class="container">
-            <h2 class="section-title">🎁 Pemenang Doorprize</h2>
-            <div class="doorprize-results-wrapper">
-                <div class="doorprize-results-grid" id="doorprize-results">
-                    <!-- Filled by JavaScript -->
-                </div>
+        <!-- HASIL DETAIL PER CABOR -->
+        <section class="hasil-detail-section">
+            <h2>Hasil Detail Per Cabor</h2>
+            <div id="hasilDetail" class="hasil-detail-container">
+                <!-- Di-generate dari data.js -->
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <!-- Voting Results -->
-    <section class="voting-results-section">
-        <div class="container">
-            <h2 class="section-title">🗳️ Hasil Voting Favorit</h2>
-            <div class="voting-results-wrapper">
-                <div class="voting-results-card glass">
-                    <h3>🏅 Korlap Terkompak</h3>
-                    <div class="voting-results-bar" id="voting-results-1">
-                        <!-- Filled by JavaScript -->
-                    </div>
-                </div>
-                <div class="voting-results-card glass">
-                    <h3>🎊 Supporter Terheboh</h3>
-                    <div class="voting-results-bar" id="voting-results-2">
-                        <!-- Filled by JavaScript -->
-                    </div>
-                </div>
-                <div class="voting-results-card glass">
-                    <h3>🎭 Maskot Terbaik</h3>
-                    <div class="voting-results-bar" id="voting-results-3">
-                        <!-- Filled by JavaScript -->
-                    </div>
-                </div>
-                <div class="voting-results-card glass">
-                    <h3>⭐ Peserta Terfavorit</h3>
-                    <div class="voting-results-bar" id="voting-results-4">
-                        <!-- Filled by JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Gallery Juara -->
-    <section id="galeri" class="galeri-juara-section">
-        <div class="container">
-            <h2 class="section-title">📸 Galeri Juara & Momen</h2>
-            <div class="galeri-juara-grid" id="galeri-grid">
-                <!-- Filled by JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Statistics Summary -->
-    <section class="summary-section">
-        <div class="container">
-            <h2 class="section-title">📊 Ringkasan Event</h2>
-            <div class="summary-grid">
-                <div class="summary-card glass">
-                    <div class="summary-icon">👥</div>
-                    <h3>Total Peserta</h3>
-                    <p class="summary-value" id="total-peserta">0</p>
-                </div>
-                <div class="summary-card glass">
-                    <div class="summary-icon">🏆</div>
-                    <h3>Total Cabor</h3>
-                    <p class="summary-value" id="total-cabor">8</p>
-                </div>
-                <div class="summary-card glass">
-                    <div class="summary-icon">👨‍👩‍👧‍👦</div>
-                    <h3>Korlap Peserta</h3>
-                    <p class="summary-value" id="total-korlap">5</p>
-                </div>
-                <div class="summary-card glass">
-                    <div class="summary-icon">🎁</div>
-                    <h3>Total Hadiah</h3>
-                    <p class="summary-value" id="total-hadiah">6+</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>SEMARAK AGUSTUS 2026</h4>
-                    <p>RT 007 RW 015 TCI 2</p>
-                    <p>Guyub, Sportif, Meriah, dan Digital</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Event Details</h4>
-                    <p>📅 17 Agustus 2026</p>
-                    <p>⏰ 07:00 - 17:00 WIB</p>
-                    <p>📍 Lapangan RT 007</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Menu Utama</h4>
-                    <p><a href="index.html" style="color: var(--accent); text-decoration: none;">← Kembali ke Beranda</a></p>
-                    <p>🎉 Acara Meriah</p>
-                    <p>🏆 Kompetisi Seru</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 SEMARAK AGUSTUS - RT 007 RW 015 TCI 2. Terima Kasih atas Partisipasinya!</p>
-            </div>
+            <p>&copy; 2026 Event Agustusan RT007 RW015. All rights reserved.</p>
+            <a href="index.html">← Kembali ke Beranda</a>
         </div>
     </footer>
 
-    <!-- Confetti Container -->
-    <canvas id="confetti-canvas"></canvas>
-
-    <!-- Scripts -->
-    <script src="data.js"></script>
-    <script src="hasil-script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>

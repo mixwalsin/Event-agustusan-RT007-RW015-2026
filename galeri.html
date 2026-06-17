@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri - Event Agustusan 2026</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <h1>📸 Galeri Acara</h1>
+            </div>
+            <a href="index.html" class="btn btn-secondary">← Kembali</a>
+        </div>
+    </nav>
+
+    <div class="container galeri-container">
+        <!-- FILTER KATEGORI -->
+        <section class="filter-section">
+            <label for="filterGaleri">Filter Kategori:</label>
+            <select id="filterGaleri" onchange="filterGaleri()">
+                <option value="">-- Semua --</option>
+                <option value="pembukaan">Pembukaan</option>
+                <option value="lomba">Lomba</option>
+                <option value="penutupan">Penutupan</option>
+                <option value="fun">Behind The Scene</option>
+            </select>
+        </section>
+
+        <!-- GALERI GRID -->
+        <section class="galeri-section">
+            <div class="galeri-grid" id="galeriGrid">
+                <!-- Di-generate dari data.js -->
+            </div>
+        </section>
+
+        <!-- LIGHTBOX / MODAL -->
+        <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+            <span class="lightbox-close" onclick="closeLightbox()">✕</span>
+            <img id="lightboxImage" src="" alt="Galeri Full Size">
+            <div class="lightbox-nav">
+                <button onclick="prevImage()" class="lightbox-btn">❮ Sebelumnya</button>
+                <button onclick="nextImage()" class="lightbox-btn">Selanjutnya ❯</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Event Agustusan RT007 RW015. All rights reserved.</p>
+            <a href="index.html">← Kembali ke Beranda</a>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

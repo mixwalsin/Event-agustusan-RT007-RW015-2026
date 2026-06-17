@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Peserta - Event Agustusan 2026</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <h1>📋 Daftar Peserta</h1>
+            </div>
+            <a href="index.html" class="btn btn-secondary">← Kembali</a>
+        </div>
+    </nav>
+
+    <div class="container daftar-container">
+        <section class="daftar-section">
+            <h2>Formulir Pendaftaran</h2>
+            <form class="daftar-form" onsubmit="submitPendaftaran(event)">
+                <div class="form-group">
+                    <label for="nama">Nama Lengkap *</label>
+                    <input type="text" id="nama" name="nama" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="usia">Usia *</label>
+                    <input type="number" id="usia" name="usia" min="5" max="100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nohp">No. HP *</label>
+                    <input type="tel" id="nohp" name="nohp" pattern="[0-9+\-\s()]+" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cabor">Pilih Cabor (Bisa Pilih Lebih Dari 1) *</label>
+                    <div class="checkbox-group" id="caborCheckboxes">
+                        <!-- Di-generate dari data.js -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="kelompok">Kelompok Usia *</label>
+                    <select id="kelompok" name="kelompok" required>
+                        <option>-- Pilih Kelompok --</option>
+                        <option>Anak-anak (5-12 tahun)</option>
+                        <option>Remaja (13-20 tahun)</option>
+                        <option>Dewasa (21-35 tahun)</option>
+                        <option>Lansia (36+ tahun)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="noRumah">No. Rumah/Blok *</label>
+                    <input type="text" id="noRumah" name="noRumah" required>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="agreeTerms" required>
+                        Saya setuju dengan syarat dan ketentuan event
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">✅ Daftar Sekarang</button>
+                <button type="reset" class="btn btn-secondary">🔄 Reset</button>
+            </form>
+
+            <div id="daftarMessage" class="message"></div>
+        </section>
+
+        <!-- DAFTAR PESERTA YANG SUDAH TERDAFTAR -->
+        <section class="peserta-list-section">
+            <h2>Peserta yang Sudah Terdaftar</h2>
+            <div class="peserta-list" id="pesertaList">
+                <!-- Di-generate dari data.js -->
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Event Agustusan RT007 RW015. All rights reserved.</p>
+            <a href="index.html">← Kembali ke Beranda</a>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
