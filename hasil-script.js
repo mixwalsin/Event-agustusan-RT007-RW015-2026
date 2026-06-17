@@ -1,13 +1,9 @@
 /* ========================================
    HASIL EVENT SCRIPT
    Menampilkan hasil event Agustusan 2026
+   Integrasi: PHP API Backend + data statis fallback
    ======================================== */
 
-// ======== INITIALIZATION ========
-// ISI DENGAN KREDENSIAL PROYEK SUPABASE ANDA SECARA BENAR
-const SUPABASE_URL = "https://tjrqubmjndqxlwcrrszl.supabase.co"; // Diambil dari subdomain URL Anda di screenshot
-const SUPABASE_KEY = "tjrqubmjndgxlwcrrszl";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initResultsDisplay();
@@ -58,65 +54,38 @@ function initNavigation() {
 }
 
 // ======== HASIL PERTANDINGAN ========
-function initResultsDisplay() {
+async function initResultsDisplay() {
     const resultsGrid = document.getElementById('results-grid');
+    if (!resultsGrid) return;
 
-    const matches = [
-        {
-            cabor: 'Voli Putri',
-            icon: '🏐',
-            teamA: 'Tim Korlap 1',
-            scoreA: 25,
-            teamB: 'Tim Korlap 3',
-            scoreB: 18,
-            status: 'SELESAI'
-        },
-        {
-            cabor: 'Futsal Campuran',
-            icon: '⚽',
-            teamA: 'Tim Korlap 2',
-            scoreA: 5,
-            teamB: 'Tim Korlap 4',
-            scoreB: 3,
-            status: 'SELESAI'
-        },
-        {
-            cabor: 'Bulu Tangkis Ganda',
-            icon: '🏸',
-            teamA: 'Tim Korlap 5',
-            scoreA: 21,
-            teamB: 'Tim Korlap 1',
-            scoreB: 19,
-            status: 'SELESAI'
-        },
-        {
-            cabor: 'Tenis Meja Tunggal',
-            icon: '🏓',
-            teamA: 'Tim Korlap 3',
-            scoreA: 11,
-            teamB: 'Tim Korlap 2',
-            scoreB: 6,
-            status: 'SELESAI'
-        },
-        {
-            cabor: 'Lari Estafet Keluarga',
-            icon: '🏃',
-            teamA: 'Tim Korlap 1',
-            scoreA: 45,
-            teamB: 'Tim Korlap 3',
-            scoreB: 48,
-            status: 'SELESAI'
-        },
-        {
-            cabor: 'Catur Terbuka',
-            icon: '♟️',
-            teamA: 'Tim Korlap 4',
-            scoreA: 7,
-            teamB: 'Tim Korlap 5',
-            scoreB: 5,
-            status: 'SELESAI'
+    let matches = null;
+
+    if (typeof getSkor === 'function') {
+        const res = await getSkor();
+        if (res && res.success && res.data.length > 0) {
+            matches = res.data.map(s => ({
+                cabor: s.nama_cabor ? `${s.nama_cabor}` : s.nama_match,
+                icon: '🏆',
+                teamA: s.tim_a || 'Tim A',
+                scoreA: s.skor_a,
+                teamB: s.tim_b || 'Tim B',
+                scoreB: s.skor_b,
+                status: s.status_match === 'selesai' ? 'SELESAI' : s.status_match === 'ongoing' ? '🔴 LIVE' : 'BELUM MULAI'
+            }));
         }
-    ];
+    }
+
+    // Fallback data statis
+    if (!matches) {
+        matches = [
+            { cabor: 'Voli Putri', icon: '🏐', teamA: 'Tim Korlap 1', scoreA: 25, teamB: 'Tim Korlap 3', scoreB: 18, status: 'SELESAI' },
+            { cabor: 'Futsal Campuran', icon: '⚽', teamA: 'Tim Korlap 2', scoreA: 5, teamB: 'Tim Korlap 4', scoreB: 3, status: 'SELESAI' },
+            { cabor: 'Bulu Tangkis Ganda', icon: '🏸', teamA: 'Tim Korlap 5', scoreA: 21, teamB: 'Tim Korlap 1', scoreB: 19, status: 'SELESAI' },
+            { cabor: 'Tenis Meja Tunggal', icon: '🏓', teamA: 'Tim Korlap 3', scoreA: 11, teamB: 'Tim Korlap 2', scoreB: 6, status: 'SELESAI' },
+            { cabor: 'Lari Estafet Keluarga', icon: '🏃', teamA: 'Tim Korlap 1', scoreA: 45, teamB: 'Tim Korlap 3', scoreB: 48, status: 'SELESAI' },
+            { cabor: 'Catur Terbuka', icon: '♟️', teamA: 'Tim Korlap 4', scoreA: 7, teamB: 'Tim Korlap 5', scoreB: 5, status: 'SELESAI' }
+        ];
+    }
 
     resultsGrid.innerHTML = matches.map(match => `
         <div class="hasil-card glass">
@@ -140,51 +109,36 @@ function initResultsDisplay() {
 }
 
 // ======== KLASEMEN KORLAP ========
-function initKlasemenDisplay() {
+async function initKlasemenDisplay() {
     const tableBody = document.getElementById('klasemen-table-body');
+    if (!tableBody) return;
 
-    const klasemen = [
-        {
-            rank: 1,
-            name: 'Korlap 1',
-            emas: 3,
-            perak: 2,
-            perunggu: 1,
-            total: 450
-        },
-        {
-            rank: 2,
-            name: 'Korlap 3',
-            emas: 2,
-            perak: 2,
-            perunggu: 2,
-            total: 420
-        },
-        {
-            rank: 3,
-            name: 'Korlap 2',
-            emas: 2,
-            perak: 1,
-            perunggu: 2,
-            total: 380
-        },
-        {
-            rank: 4,
-            name: 'Korlap 4',
-            emas: 1,
-            perak: 1,
-            perunggu: 1,
-            total: 350
-        },
-        {
-            rank: 5,
-            name: 'Korlap 5',
-            emas: 0,
-            perak: 2,
-            perunggu: 2,
-            total: 310
+    let klasemen = null;
+
+    if (typeof getLeaderboard === 'function') {
+        const res = await getLeaderboard();
+        if (res && res.success && res.data.length > 0) {
+            klasemen = res.data.map((row, i) => ({
+                rank: i + 1,
+                name: row.nama_korlap,
+                emas: row.emas,
+                perak: row.perak,
+                perunggu: row.perunggu,
+                total: row.total_poin
+            }));
         }
-    ];
+    }
+
+    // Fallback
+    if (!klasemen) {
+        klasemen = [
+            { rank: 1, name: 'Korlap 1', emas: 3, perak: 2, perunggu: 1, total: 450 },
+            { rank: 2, name: 'Korlap 3', emas: 2, perak: 2, perunggu: 2, total: 420 },
+            { rank: 3, name: 'Korlap 2', emas: 2, perak: 1, perunggu: 2, total: 380 },
+            { rank: 4, name: 'Korlap 4', emas: 1, perak: 1, perunggu: 1, total: 350 },
+            { rank: 5, name: 'Korlap 5', emas: 0, perak: 2, perunggu: 2, total: 310 }
+        ];
+    }
 
     tableBody.innerHTML = klasemen.map((item, index) => `
         <tr class="rank-row rank-${index + 1}">
@@ -201,7 +155,6 @@ function initKlasemenDisplay() {
         </tr>
     `).join('');
 
-    // Animate table rows
     document.querySelectorAll('.rank-row').forEach((row, index) => {
         setTimeout(() => {
             row.style.animation = 'slideInLeft 0.5s ease-out';
@@ -210,69 +163,44 @@ function initKlasemenDisplay() {
 }
 
 // ======== DAFTAR JUARA ========
-function initJuaraDisplay() {
+async function initJuaraDisplay() {
     const juaraGrid = document.getElementById('juara-grid');
+    if (!juaraGrid) return;
 
-    const juara = [
-        {
-            cabor: 'Bulu Tangkis',
-            icon: '🏸',
-            juara1: 'Hery Suryanto (Korlap 1)',
-            juara2: 'Budi Santoso (Korlap 3)',
-            juara3: 'Ahmad Hidayat (Korlap 2)'
-        },
-        {
-            cabor: 'Voli Putri',
-            icon: '🏐',
-            juara1: 'Tim Korlap 1',
-            juara2: 'Tim Korlap 3',
-            juara3: 'Tim Korlap 2'
-        },
-        {
-            cabor: 'Futsal',
-            icon: '⚽',
-            juara1: 'Tim Korlap 2',
-            juara2: 'Tim Korlap 4',
-            juara3: 'Tim Korlap 1'
-        },
-        {
-            cabor: 'Tenis Meja',
-            icon: '🏓',
-            juara1: 'Siti Nurhaliza (Korlap 3)',
-            juara2: 'Riyo Kusnanda (Korlap 2)',
-            juara3: 'Dwi Pratama (Korlap 5)'
-        },
-        {
-            cabor: 'Catur',
-            icon: '♟️',
-            juara1: 'Rahman Wijaya (Korlap 4)',
-            juara2: 'Hartono (Korlap 5)',
-            juara3: 'Sumarno (Korlap 1)'
-        },
-        {
-            cabor: 'Lari Estafet',
-            icon: '🏃',
-            juara1: 'Tim Korlap 1',
-            juara2: 'Tim Korlap 3',
-            juara3: 'Tim Korlap 2'
-        },
-        {
-            cabor: 'Lomba Anak',
-            icon: '🎯',
-            juara1: 'Anak-anak Korlap 3',
-            juara2: 'Anak-anak Korlap 1',
-            juara3: 'Anak-anak Korlap 2'
-        },
-        {
-            cabor: 'Senam Bersama',
-            icon: '💃',
-            juara1: 'Semua Peserta',
-            juara2: 'Partisipasi Aktif',
-            juara3: 'Berhasil Luar Biasa'
+    let juaraGrouped = null;
+
+    if (typeof getJuara === 'function') {
+        const res = await getJuara();
+        if (res && res.success && res.data.length > 0) {
+            const grouped = {};
+            res.data.forEach(j => {
+                const key = j.nama_cabor || 'Umum';
+                if (!grouped[key]) {
+                    grouped[key] = { cabor: key, icon: j.icon_cabor || '🏆', juara1: '-', juara2: '-', juara3: '-' };
+                }
+                if (j.peringkat === 1) grouped[key].juara1 = j.nama_juara;
+                if (j.peringkat === 2) grouped[key].juara2 = j.nama_juara;
+                if (j.peringkat === 3) grouped[key].juara3 = j.nama_juara;
+            });
+            juaraGrouped = Object.values(grouped);
         }
-    ];
+    }
 
-    juaraGrid.innerHTML = juara.map(item => `
+    // Fallback
+    if (!juaraGrouped) {
+        juaraGrouped = [
+            { cabor: 'Bulu Tangkis', icon: '🏸', juara1: 'Hery Suryanto (Korlap 1)', juara2: 'Budi Santoso (Korlap 3)', juara3: 'Ahmad Hidayat (Korlap 2)' },
+            { cabor: 'Voli Putri', icon: '🏐', juara1: 'Tim Korlap 1', juara2: 'Tim Korlap 3', juara3: 'Tim Korlap 2' },
+            { cabor: 'Futsal', icon: '⚽', juara1: 'Tim Korlap 2', juara2: 'Tim Korlap 4', juara3: 'Tim Korlap 1' },
+            { cabor: 'Tenis Meja', icon: '🏓', juara1: 'Siti Nurhaliza (Korlap 3)', juara2: 'Riyo Kusnanda (Korlap 2)', juara3: 'Dwi Pratama (Korlap 5)' },
+            { cabor: 'Catur', icon: '♟️', juara1: 'Rahman Wijaya (Korlap 4)', juara2: 'Hartono (Korlap 5)', juara3: 'Sumarno (Korlap 1)' },
+            { cabor: 'Lari Estafet', icon: '🏃', juara1: 'Tim Korlap 1', juara2: 'Tim Korlap 3', juara3: 'Tim Korlap 2' },
+            { cabor: 'Lomba Anak', icon: '🎯', juara1: 'Anak-anak Korlap 3', juara2: 'Anak-anak Korlap 1', juara3: 'Anak-anak Korlap 2' },
+            { cabor: 'Senam Bersama', icon: '💃', juara1: 'Semua Peserta', juara2: 'Partisipasi Aktif', juara3: 'Berhasil Luar Biasa' }
+        ];
+    }
+
+    juaraGrid.innerHTML = juaraGrouped.map(item => `
         <div class="juara-card glass">
             <div class="juara-header">
                 <h3>${item.icon} ${item.cabor}</h3>
@@ -296,47 +224,38 @@ function initJuaraDisplay() {
 }
 
 // ======== DOORPRIZE RESULTS ========
-function initDoorprizeResults() {
+async function initDoorprizeResults() {
     const doorprizeResults = document.getElementById('doorprize-results');
+    if (!doorprizeResults) return;
 
-    const winners = [
-        {
-            name: 'Budi Hartono',
-            korlap: 'Korlap 1',
-            hadiah: '🥇 TV LED 55"',
-            waktu: '16:05 WIB'
-        },
-        {
-            name: 'Siti Muslikhah',
-            korlap: 'Korlap 3',
-            hadiah: '🥈 Motor Vespa',
-            waktu: '16:15 WIB'
-        },
-        {
-            name: 'Ahmad Wijaya',
-            korlap: 'Korlap 2',
-            hadiah: '🥉 Motor 125cc',
-            waktu: '16:25 WIB'
-        },
-        {
-            name: 'Rina Suryani',
-            korlap: 'Korlap 4',
-            hadiah: '🎯 Kulkas 2 Pintu',
-            waktu: '16:35 WIB'
-        },
-        {
-            name: 'Hendro Sutrisno',
-            korlap: 'Korlap 5',
-            hadiah: '💝 Paket Liburan',
-            waktu: '16:45 WIB'
-        },
-        {
-            name: 'Dewi Lestari',
-            korlap: 'Korlap 1',
-            hadiah: '🏅 Set Gadget',
-            waktu: '16:55 WIB'
+    let winners = null;
+
+    if (typeof getDoorprize === 'function') {
+        const res = await getDoorprize();
+        if (res && res.success) {
+            const withWinners = res.data.filter(d => d.pemenang);
+            if (withWinners.length > 0) {
+                winners = withWinners.map(d => ({
+                    name: d.pemenang,
+                    korlap: d.nama_korlap || '-',
+                    hadiah: `${d.emoji} ${d.deskripsi || d.judul}`,
+                    waktu: d.waktu_undian ? new Date(d.waktu_undian).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB' : '-'
+                }));
+            }
         }
-    ];
+    }
+
+    // Fallback
+    if (!winners) {
+        winners = [
+            { name: 'Budi Hartono', korlap: 'Korlap 1', hadiah: '🥇 TV LED 55"', waktu: '16:05 WIB' },
+            { name: 'Siti Muslikhah', korlap: 'Korlap 3', hadiah: '🥈 Motor Vespa', waktu: '16:15 WIB' },
+            { name: 'Ahmad Wijaya', korlap: 'Korlap 2', hadiah: '🥉 Motor 125cc', waktu: '16:25 WIB' },
+            { name: 'Rina Suryani', korlap: 'Korlap 4', hadiah: '🎯 Kulkas 2 Pintu', waktu: '16:35 WIB' },
+            { name: 'Hendro Sutrisno', korlap: 'Korlap 5', hadiah: '💝 Paket Liburan', waktu: '16:45 WIB' },
+            { name: 'Dewi Lestari', korlap: 'Korlap 1', hadiah: '🏅 Set Gadget', waktu: '16:55 WIB' }
+        ];
+    }
 
     doorprizeResults.innerHTML = winners.map((winner, index) => `
         <div class="doorprize-result-card glass" style="animation-delay: ${index * 0.1}s;">
@@ -353,46 +272,41 @@ function initDoorprizeResults() {
 }
 
 // ======== VOTING RESULTS ========
-function initVotingResults() {
-    // Voting Results 1 - Korlap Terkompak
-    const votingData1 = {
-        'Korlap 1': 125,
-        'Korlap 2': 98,
-        'Korlap 3': 142,
-        'Korlap 4': 87,
-        'Korlap 5': 110
-    };
-    displayVotingResults('voting-results-1', votingData1);
+async function initVotingResults() {
+    const categories = [
+        { key: 'Korlap Terkompak',   elId: 'voting-results-1' },
+        { key: 'Supporter Terheboh', elId: 'voting-results-2' },
+        { key: 'Maskot Terbaik',     elId: 'voting-results-3' },
+        { key: 'Peserta Terfavorit', elId: 'voting-results-4' }
+    ];
 
-    // Voting Results 2 - Supporter Terheboh
-    const votingData2 = {
-        'Korlap 1': 156,
-        'Korlap 2': 143,
-        'Korlap 3': 189,
-        'Korlap 4': 76,
-        'Korlap 5': 120
-    };
-    displayVotingResults('voting-results-2', votingData2);
+    let apiData = null;
+    if (typeof getVoting === 'function') {
+        const res = await getVoting();
+        if (res && res.success) {
+            apiData = res.data;
+        }
+    }
 
-    // Voting Results 3 - Maskot Terbaik
-    const votingData3 = {
-        'Korlap 1': 134,
-        'Korlap 2': 112,
-        'Korlap 3': 156,
-        'Korlap 4': 98,
-        'Korlap 5': 145
-    };
-    displayVotingResults('voting-results-3', votingData3);
-
-    // Voting Results 4 - Peserta Terfavorit
-    const votingData4 = {
-        'Korlap 1': 167,
-        'Korlap 2': 145,
-        'Korlap 3': 198,
-        'Korlap 4': 112,
-        'Korlap 5': 128
-    };
-    displayVotingResults('voting-results-4', votingData4);
+    categories.forEach(({ key, elId }) => {
+        let data = {};
+        if (apiData) {
+            apiData.filter(v => v.kategori === key).forEach(v => {
+                data[v.nama_korlap] = parseInt(v.jumlah_vote) || 0;
+            });
+        }
+        if (Object.keys(data).length === 0) {
+            // Fallback data statis
+            const fallback = {
+                'Korlap Terkompak':   { 'Korlap 1': 125, 'Korlap 2': 98,  'Korlap 3': 142, 'Korlap 4': 87,  'Korlap 5': 110 },
+                'Supporter Terheboh': { 'Korlap 1': 156, 'Korlap 2': 143, 'Korlap 3': 189, 'Korlap 4': 76,  'Korlap 5': 120 },
+                'Maskot Terbaik':     { 'Korlap 1': 134, 'Korlap 2': 112, 'Korlap 3': 156, 'Korlap 4': 98,  'Korlap 5': 145 },
+                'Peserta Terfavorit': { 'Korlap 1': 167, 'Korlap 2': 145, 'Korlap 3': 198, 'Korlap 4': 112, 'Korlap 5': 128 }
+            };
+            data = fallback[key] || {};
+        }
+        displayVotingResults(elId, data);
+    });
 }
 
 function displayVotingResults(elementId, data) {
@@ -429,19 +343,31 @@ function displayVotingResults(elementId, data) {
 }
 
 // ======== GALERI JUARA ========
-function initGaleriJuara() {
+async function initGaleriJuara() {
     const galeriGrid = document.getElementById('galeri-grid');
+    if (!galeriGrid) return;
 
-    const galeri = [
-        { title: 'Juara Bulu Tangkis', emoji: '🏸', category: 'Cabor' },
-        { title: 'Juara Voli', emoji: '🏐', category: 'Cabor' },
-        { title: 'Juara Futsal', emoji: '⚽', category: 'Cabor' },
-        { title: 'Doorprize Meriah', emoji: '🎁', category: 'Undian' },
-        { title: 'Malam Puncak', emoji: '🎊', category: 'Acara' },
-        { title: 'Panitia Hebat', emoji: '👥', category: 'Tim' },
-        { title: 'Sponsor Setia', emoji: '🏢', category: 'Sponsor' },
-        { title: 'UMKM Berjaya', emoji: '🏪', category: 'UMKM' }
-    ];
+    let galeri = null;
+
+    if (typeof getGaleri === 'function') {
+        const res = await getGaleri();
+        if (res && res.success && res.data.length > 0) {
+            galeri = res.data.map(g => ({ title: g.judul, emoji: g.emoji, category: g.kategori }));
+        }
+    }
+
+    if (!galeri) {
+        galeri = [
+            { title: 'Juara Bulu Tangkis', emoji: '🏸', category: 'Cabor' },
+            { title: 'Juara Voli', emoji: '🏐', category: 'Cabor' },
+            { title: 'Juara Futsal', emoji: '⚽', category: 'Cabor' },
+            { title: 'Doorprize Meriah', emoji: '🎁', category: 'Undian' },
+            { title: 'Malam Puncak', emoji: '🎊', category: 'Acara' },
+            { title: 'Panitia Hebat', emoji: '👥', category: 'Tim' },
+            { title: 'Sponsor Setia', emoji: '🏢', category: 'Sponsor' },
+            { title: 'UMKM Berjaya', emoji: '🏪', category: 'UMKM' }
+        ];
+    }
 
     galeriGrid.innerHTML = galeri.map(item => `
         <div class="galeri-juara-item">

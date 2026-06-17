@@ -454,6 +454,160 @@ Jika microsite ini bermanfaat, jangan lupa beri star ⭐ di GitHub!
 
 ---
 
+## 🖥️ Setup Backend PHP 8.2 + MySQL (XAMPP)
+
+Backend API PHP tersedia di folder `api/` dan mendukung koneksi dari GitHub Pages maupun lokal.
+
+### 1. Cara Install XAMPP PHP 8.2
+
+1. Unduh XAMPP versi 8.2.x dari [https://www.apachefriends.org/download.html](https://www.apachefriends.org/download.html)
+2. Jalankan installer, pilih komponen: **Apache**, **MySQL**, **PHP**
+3. Install ke direktori default (`C:\xampp` di Windows atau `/opt/lampp` di Linux)
+4. Buka **XAMPP Control Panel** → klik **Start** pada **Apache** dan **MySQL**
+
+### 2. Cara Taruh Project di htdocs
+
+```bash
+# Copy folder project ke:
+C:\xampp\htdocs\Event-agustusan-RT007-RW015-2026\
+# atau clone langsung:
+cd C:\xampp\htdocs
+git clone https://github.com/mixwalsin/Event-agustusan-RT007-RW015-2026.git
+```
+
+### 3. Cara Buat Database di phpMyAdmin
+
+1. Buka browser → `http://localhost/phpmyadmin`
+2. Klik **New** di sidebar kiri
+3. Isi nama database: `agustusan_rt007_2026`
+4. Pilih collation: `utf8mb4_unicode_ci`
+5. Klik **Create**
+
+### 4. Cara Import File SQL
+
+1. Di phpMyAdmin, klik database `agustusan_rt007_2026`
+2. Klik tab **Import**
+3. Klik **Choose File** → pilih file `database/agustusan_rt007_2026.sql`
+4. Klik **Import** (tombol biru bawah halaman)
+
+> File SQL sudah berisi semua tabel, foreign key, dan data seed awal termasuk **1 akun admin default**.
+
+**Kredensial Admin Default:**
+- Username: `admin`
+- Password: `Admin@2026`
+- ⚠️ **Segera ganti password** setelah pertama login via `admin.html`!
+
+Untuk generate hash baru jika lupa password, jalankan di CLI PHP:
+```php
+php -r "echo password_hash('PasswordBaru123!', PASSWORD_DEFAULT);"
+```
+Lalu UPDATE tabel `admin` di phpMyAdmin.
+
+### 5. Cara Test API
+
+Setelah XAMPP berjalan dan database diimport:
+
+```bash
+# Buka browser atau gunakan curl:
+GET  http://localhost/Event-agustusan-RT007-RW015-2026/api/pengumuman.php
+GET  http://localhost/Event-agustusan-RT007-RW015-2026/api/leaderboard.php
+GET  http://localhost/Event-agustusan-RT007-RW015-2026/api/peserta.php
+
+# Test POST (gunakan curl atau Postman):
+curl -X POST http://localhost/Event-agustusan-RT007-RW015-2026/api/login.php \
+     -H "Content-Type: application/json" \
+     -d '{"username":"admin","password":"Admin@2026"}'
+```
+
+Semua API mengembalikan JSON dengan format:
+```json
+{ "success": true, "data": [...] }
+```
+
+### 6. Cara Ubah API_BASE_URL untuk Hosting
+
+File `js/api.js` secara **otomatis** memilih URL berdasarkan hostname:
+- Jika diakses dari `localhost` atau `127.0.0.1` → gunakan URL XAMPP lokal
+- Jika diakses dari domain lain (GitHub Pages, dsb.) → gunakan URL hosting
+
+Untuk mengaktifkan URL hosting, ubah baris berikut di `js/api.js`:
+
+```javascript
+// Ubah URL ini sesuai domain cPanel Anda:
+return 'https://yourdomain.com/api';
+```
+
+### 7. Cara Upload Backend ke cPanel
+
+1. Login ke cPanel → **File Manager**
+2. Masuk ke `public_html/` (atau subdomain)
+3. Upload seluruh folder `api/` dan `database/`
+4. Buat database MySQL baru via **MySQL Databases** di cPanel
+5. Import file `database/agustusan_rt007_2026.sql` via **phpMyAdmin** di cPanel
+6. Edit `api/config.php` sesuai kredensial database hosting:
+   ```php
+   define('DB_HOST', 'localhost');
+   define('DB_USER', 'cpanel_user_dbname');
+   define('DB_PASS', 'password_database');
+   define('DB_NAME', 'cpanel_user_agustusan');
+   ```
+
+### 8. Cara Tetap Memakai GitHub Pages sebagai Frontend
+
+Frontend (HTML/CSS/JS) tetap berjalan di GitHub Pages. Yang perlu diubah:
+
+1. Pastikan `api/config.php` sudah menambahkan origin GitHub Pages ke daftar CORS:
+   ```php
+   $allowedOrigins = [
+       'https://mixwalsin.github.io',  // ← sudah ada
+       'http://localhost',
+   ];
+   ```
+2. Update `js/api.js` dengan URL API backend hosting:
+   ```javascript
+   const API_BASE_URL = "https://yourdomain.com/api";
+   ```
+3. Push perubahan `js/api.js` ke GitHub → GitHub Pages otomatis update
+4. Frontend akan fetch data ke backend hosting; jika gagal, fallback ke `data.js`
+
+---
+
+## 📁 Struktur File (Updated)
+
+```
+Event-agustusan-RT007-RW015-2026/
+├── index.html          # Halaman utama / beranda
+├── hasil.html          # Halaman hasil event
+├── admin.html          # Admin panel (login required)
+├── event-tv.html       # Tampilan TV / display publik (auto-refresh 30 det)
+├── style.css           # Stylesheet utama (glassmorphism)
+├── script.js           # Script utama (integrasi API + fallback)
+├── hasil-script.js     # Script halaman hasil (integrasi API + fallback)
+├── data.js             # Data statis fallback
+├── js/
+│   └── api.js          # Frontend API wrapper (fetch ke PHP backend)
+├── api/                # Backend PHP 8.2
+│   ├── config.php      # Konfigurasi PDO, CORS, helper response
+│   ├── login.php       # Auth admin
+│   ├── peserta.php     # CRUD peserta
+│   ├── cabor.php       # CRUD cabang olahraga
+│   ├── jadwal.php      # CRUD jadwal pertandingan
+│   ├── skor.php        # CRUD skor live
+│   ├── leaderboard.php # Klasemen korlap
+│   ├── juara.php       # CRUD daftar juara
+│   ├── doorprize.php   # CRUD doorprize + pemenang
+│   ├── voting.php      # Sistem voting
+│   ├── galeri.php      # CRUD galeri foto
+│   ├── sponsor.php     # CRUD sponsor / UMKM
+│   ├── pengumuman.php  # CRUD pengumuman
+│   └── log.php         # Log aktivitas (GET only)
+└── database/
+    └── agustusan_rt007_2026.sql  # Skema + seed data MySQL
+```
+
+---
+
 **Made with ❤️ for SEMARAK AGUSTUS 2026**
+
 
 **🇮🇩 Indonesia Raya! Merdeka! Merdeka! Merdeka!**

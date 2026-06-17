@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVENT TV – SEMARAK AGUSTUS 2026</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23DC143C'>📺</text></svg>">
+    <style>
+        :root {
+            --red: #DC143C;
+            --gold: #FFD700;
+            --bg: #080808;
+            --card: rgba(255,255,255,.04);
+            --border: rgba(255,255,255,.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: #f5f5f5;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ---- HEADER ---- */
+        .tv-header {
+            background: linear-gradient(135deg, var(--red), #8B0000);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--gold);
+        }
+        .tv-header h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
+        .tv-header .subtitle { font-size: .8rem; color: rgba(255,255,255,.7); }
+        .live-badge {
+            background: #ef4444;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: .75rem;
+            font-weight: 700;
+            animation: pulse-live 1.2s infinite;
+        }
+        @keyframes pulse-live {
+            0%,100% { opacity: 1; }
+            50%      { opacity: .5; }
+        }
+        .refresh-badge { font-size: .75rem; color: rgba(255,255,255,.5); margin-left: 12px; }
+
+        /* ---- GRID ---- */
+        .tv-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 12px;
+            padding: 16px;
+        }
+
+        /* ---- CARD ---- */
+        .tv-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        .tv-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--red), var(--gold));
+        }
+        .tv-card h2 {
+            font-size: .85rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        /* ---- COUNTDOWN ---- */
+        .tv-countdown { grid-column: 1 / -1; text-align: center; }
+        .countdown-big {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin: 8px 0;
+        }
+        .cd-unit { text-align: center; }
+        .cd-value {
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--gold);
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(255,215,0,.4);
+        }
+        .cd-label { font-size: .75rem; color: rgba(255,255,255,.5); margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+        .event-date { font-size: .85rem; color: rgba(255,255,255,.6); margin-top: 6px; }
+
+        /* ---- JADWAL ---- */
+        .jadwal-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .jadwal-item:last-child { border-bottom: none; }
+        .jadwal-time { font-size: .75rem; color: var(--gold); min-width: 54px; }
+        .jadwal-name { font-size: .85rem; font-weight: 600; }
+        .jadwal-status {
+            margin-left: auto;
+            font-size: .7rem;
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+        .status-ongoing   { background: #ef4444; color: #fff; }
+        .status-scheduled { background: #1d4ed8; color: #fff; }
+        .status-selesai   { background: #374151; color: #9ca3af; }
+
+        /* ---- RANKING ---- */
+        .rank-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .rank-item:last-child { border-bottom: none; }
+        .rank-no {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .rank-1 { background: var(--gold); color: #000; }
+        .rank-2 { background: #9ca3af; color: #000; }
+        .rank-3 { background: #b45309; color: #fff; }
+        .rank-other { background: #374151; color: #f5f5f5; }
+        .rank-name { font-size: .9rem; font-weight: 600; flex: 1; }
+        .rank-score { font-size: .85rem; color: var(--gold); font-weight: 700; }
+
+        /* ---- DOORPRIZE ---- */
+        .winner-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .winner-item:last-child { border-bottom: none; }
+        .winner-hadiah { font-size: .85rem; color: var(--gold); font-weight: 700; }
+        .winner-name   { font-size: .95rem; font-weight: 700; margin: 2px 0; }
+        .winner-korlap { font-size: .75rem; color: rgba(255,255,255,.5); }
+
+        /* ---- PENGUMUMAN ---- */
+        .pengumuman-item { padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .pengumuman-item:last-child { border-bottom: none; }
+        .pg-judul { font-size: .9rem; font-weight: 700; color: var(--gold); }
+        .pg-isi   { font-size: .8rem; color: rgba(255,255,255,.7); margin-top: 4px; line-height: 1.4; }
+
+        /* ---- SPONSOR TICKER ---- */
+        .sponsor-ticker-wrap {
+            grid-column: 1 / -1;
+            background: rgba(255,215,0,.07);
+            border: 1px solid rgba(255,215,0,.2);
+            border-radius: 8px;
+            padding: 10px 16px;
+            overflow: hidden;
+        }
+        .sponsor-ticker-label { font-size: .7rem; color: var(--gold); margin-bottom: 6px; font-weight: 700; letter-spacing: 1px; }
+        .ticker-track {
+            display: flex;
+            gap: 48px;
+            animation: ticker-scroll 30s linear infinite;
+            white-space: nowrap;
+        }
+        .ticker-track:hover { animation-play-state: paused; }
+        @keyframes ticker-scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+        .sponsor-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .85rem;
+            font-weight: 600;
+        }
+
+        /* ---- LOADING ---- */
+        .loading { color: rgba(255,255,255,.3); font-size: .85rem; font-style: italic; }
+
+        @media (max-width: 768px) {
+            .tv-grid { grid-template-columns: 1fr 1fr; }
+            .tv-countdown { grid-column: 1 / -1; }
+            .cd-value { font-size: 2.5rem; }
+        }
+        @media (max-width: 480px) {
+            .tv-grid { grid-template-columns: 1fr; }
+            .cd-value { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="tv-header">
+    <div>
+        <h1>🇮🇩 SEMARAK AGUSTUS 2026</h1>
+        <p class="subtitle">RT 007 RW 015 TCI 2 – HUT RI KE-81</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <span class="live-badge">🔴 LIVE</span>
+        <span class="refresh-badge" id="next-refresh">Auto refresh 30 detik</span>
+    </div>
+</div>
+
+<!-- Grid -->
+<div class="tv-grid">
+
+    <!-- Countdown -->
+    <div class="tv-card tv-countdown">
+        <h2>⏳ Countdown Menuju 17 Agustus 2026</h2>
+        <div class="countdown-big">
+            <div class="cd-unit"><div class="cd-value" id="tv-days">--</div><div class="cd-label">Hari</div></div>
+            <div class="cd-unit"><div class="cd-value" id="tv-hours">--</div><div class="cd-label">Jam</div></div>
+            <div class="cd-unit"><div class="cd-value" id="tv-minutes">--</div><div class="cd-label">Menit</div></div>
+            <div class="cd-unit"><div class="cd-value" id="tv-seconds">--</div><div class="cd-label">Detik</div></div>
+        </div>
+        <p class="event-date">📅 17 Agustus 2026 | 07:00 – 17:00 WIB | RT 007 RW 015 TCI 2</p>
+    </div>
+
+    <!-- Jadwal Berikutnya -->
+    <div class="tv-card">
+        <h2>📅 Jadwal Pertandingan</h2>
+        <div id="tv-jadwal"><p class="loading">Memuat jadwal…</p></div>
+    </div>
+
+    <!-- Ranking Korlap -->
+    <div class="tv-card">
+        <h2>🏆 Ranking Korlap</h2>
+        <div id="tv-ranking"><p class="loading">Memuat ranking…</p></div>
+    </div>
+
+    <!-- Pemenang Doorprize -->
+    <div class="tv-card">
+        <h2>🎁 Pemenang Doorprize</h2>
+        <div id="tv-doorprize"><p class="loading">Memuat pemenang…</p></div>
+    </div>
+
+    <!-- Pengumuman MC -->
+    <div class="tv-card" style="grid-column: span 2;">
+        <h2>📢 Pengumuman</h2>
+        <div id="tv-pengumuman"><p class="loading">Memuat pengumuman…</p></div>
+    </div>
+
+    <!-- Sponsor Ticker -->
+    <div class="sponsor-ticker-wrap">
+        <div class="sponsor-ticker-label">✨ DIDUKUNG OLEH</div>
+        <div class="ticker-track" id="tv-sponsor-track">
+            <span class="loading">Memuat sponsor…</span>
+        </div>
+    </div>
+
+</div>
+
+<script src="js/api.js"></script>
+<script>
+/* ============================================================
+   Event TV Script – auto refresh setiap 30 detik
+   ============================================================ */
+
+const REFRESH_INTERVAL = 30 * 1000; // 30 detik
+let refreshTimer;
+let secondsLeft = 30;
+
+// ---- Countdown -----------------------------------------------
+function startCountdown() {
+    const eventDate = new Date('2026-08-17T07:00:00').getTime();
+    function tick() {
+        const now  = Date.now();
+        const diff = eventDate - now;
+        if (diff <= 0) {
+            document.getElementById('tv-days').textContent    = '00';
+            document.getElementById('tv-hours').textContent   = '00';
+            document.getElementById('tv-minutes').textContent = '00';
+            document.getElementById('tv-seconds').textContent = '00';
+            return;
+        }
+        document.getElementById('tv-days').textContent    = String(Math.floor(diff / 86400000)).padStart(2,'0');
+        document.getElementById('tv-hours').textContent   = String(Math.floor((diff % 86400000) / 3600000)).padStart(2,'0');
+        document.getElementById('tv-minutes').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
+        document.getElementById('tv-seconds').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
+    }
+    tick();
+    setInterval(tick, 1000);
+}
+
+// ---- Jadwal --------------------------------------------------
+async function loadJadwal() {
+    const el = document.getElementById('tv-jadwal');
+    const res = await getJadwal();
+    if (!res || !res.success || res.data.length === 0) {
+        el.innerHTML = '<p style="color:#888;font-size:.8rem;">Belum ada jadwal tersedia.</p>';
+        return;
+    }
+    // Urutkan: ongoing dulu, lalu scheduled, lalu selesai
+    const order = { ongoing: 0, scheduled: 1, selesai: 2 };
+    const sorted = [...res.data].sort((a,b) => (order[a.status]||1) - (order[b.status]||1));
+    el.innerHTML = sorted.slice(0, 6).map(j => `
+        <div class="jadwal-item">
+            <span class="jadwal-time">${j.waktu_mulai ? new Date(j.waktu_mulai).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '--:--'}</span>
+            <div>
+                <div class="jadwal-name">${j.nama_match}</div>
+                <div style="font-size:.7rem;color:#9ca3af;">${j.tim_a||'?'} vs ${j.tim_b||'?'}</div>
+            </div>
+            <span class="jadwal-status status-${j.status}">${j.status === 'ongoing' ? '🔴 LIVE' : j.status === 'scheduled' ? 'Akan Datang' : 'Selesai'}</span>
+        </div>
+    `).join('');
+}
+
+// ---- Ranking -------------------------------------------------
+async function loadRanking() {
+    const el = document.getElementById('tv-ranking');
+    const res = await getLeaderboard();
+    if (!res || !res.success || res.data.length === 0) {
+        // Fallback
+        const fallback = [
+            { peringkat:1, nama_korlap:'Korlap 1', total_poin: 0 },
+            { peringkat:2, nama_korlap:'Korlap 2', total_poin: 0 },
+            { peringkat:3, nama_korlap:'Korlap 3', total_poin: 0 },
+            { peringkat:4, nama_korlap:'Korlap 4', total_poin: 0 },
+            { peringkat:5, nama_korlap:'Korlap 5', total_poin: 0 },
+        ];
+        el.innerHTML = fallback.map(r => renderRankItem(r)).join('');
+        return;
+    }
+    el.innerHTML = res.data.map(r => renderRankItem(r)).join('');
+}
+
+function renderRankItem(r) {
+    const cls = r.peringkat === 1 ? 'rank-1' : r.peringkat === 2 ? 'rank-2' : r.peringkat === 3 ? 'rank-3' : 'rank-other';
+    const icon = r.peringkat === 1 ? '🥇' : r.peringkat === 2 ? '🥈' : r.peringkat === 3 ? '🥉' : r.peringkat;
+    return `<div class="rank-item">
+        <div class="rank-no ${cls}">${icon}</div>
+        <div class="rank-name">${r.nama_korlap}</div>
+        <div class="rank-score">${r.total_poin} pt</div>
+    </div>`;
+}
+
+// ---- Doorprize -----------------------------------------------
+async function loadDoorprize() {
+    const el = document.getElementById('tv-doorprize');
+    const res = await getDoorprize();
+    if (!res || !res.success) { el.innerHTML = '<p style="color:#888;font-size:.8rem;">Belum ada pemenang.</p>'; return; }
+    const winners = res.data.filter(d => d.pemenang);
+    if (winners.length === 0) {
+        el.innerHTML = '<p style="color:#888;font-size:.8rem;">Undian belum dimulai.</p>';
+        return;
+    }
+    el.innerHTML = winners.map(d => `
+        <div class="winner-item">
+            <div class="winner-hadiah">${d.emoji} ${d.judul}</div>
+            <div class="winner-name">👤 ${d.pemenang}</div>
+            <div class="winner-korlap">👥 ${d.nama_korlap || '-'}</div>
+        </div>
+    `).join('');
+}
+
+// ---- Pengumuman ----------------------------------------------
+async function loadPengumuman() {
+    const el = document.getElementById('tv-pengumuman');
+    const res = await getPengumuman();
+    if (!res || !res.success || res.data.length === 0) {
+        el.innerHTML = '<p style="color:#888;font-size:.8rem;">Belum ada pengumuman.</p>';
+        return;
+    }
+    el.innerHTML = res.data.slice(0, 4).map(p => `
+        <div class="pengumuman-item">
+            <div class="pg-judul">${p.judul}</div>
+            <div class="pg-isi">${p.isi}</div>
+        </div>
+    `).join('');
+}
+
+// ---- Sponsor Ticker ------------------------------------------
+async function loadSponsor() {
+    const track = document.getElementById('tv-sponsor-track');
+    const res = await getSponsor();
+    let sponsors = res?.success && res.data.length > 0 ? res.data : [
+        { icon: '🏢', nama: 'PT Maju Jaya', kategori: 'Sponsor Utama' },
+        { icon: '📺', nama: 'Toko Elektronik Jaya', kategori: 'Sponsor Resmi' },
+        { icon: '🍜', nama: 'Warung Mak Ayu', kategori: 'UMKM Kuliner' },
+        { icon: '🎨', nama: 'Toko Kerajinan Rakyat', kategori: 'UMKM Kerajinan' },
+        { icon: '💊', nama: 'Apotek Kesehatan', kategori: 'Mitra Kesehatan' },
+        { icon: '🍰', nama: 'Toko Kue Tradisional', kategori: 'UMKM Makanan' },
+    ];
+    // Duplikat untuk efek infinite scroll
+    const html = [...sponsors, ...sponsors].map(s =>
+        `<span class="sponsor-chip">${s.icon} ${s.nama} <span style="color:rgba(255,255,255,.4);font-size:.75rem;">${s.kategori || ''}</span></span>`
+    ).join('');
+    track.innerHTML = html;
+}
+
+// ---- Refresh logic ------------------------------------------
+async function loadAll() {
+    await Promise.all([
+        loadJadwal(),
+        loadRanking(),
+        loadDoorprize(),
+        loadPengumuman(),
+        loadSponsor(),
+    ]);
+}
+
+function startRefreshTimer() {
+    secondsLeft = REFRESH_INTERVAL / 1000;
+    clearInterval(refreshTimer);
+    refreshTimer = setInterval(() => {
+        secondsLeft--;
+        document.getElementById('next-refresh').textContent = `Refresh dalam ${secondsLeft} detik`;
+        if (secondsLeft <= 0) {
+            loadAll();
+            secondsLeft = REFRESH_INTERVAL / 1000;
+        }
+    }, 1000);
+}
+
+// ---- Init ---------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    startCountdown();
+    loadAll();
+    startRefreshTimer();
+});
+</script>
+</body>
+</html>

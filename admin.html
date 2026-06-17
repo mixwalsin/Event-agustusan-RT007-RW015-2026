@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel – SEMARAK AGUSTUS 2026</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23DC143C'>⚙️</text></svg>">
+    <style>
+        body { background: #0d0d0d; color: #f5f5f5; font-family: 'Segoe UI', sans-serif; }
+        .admin-nav { background: rgba(20,20,20,.95); padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 2px solid var(--primary,#DC143C); position: sticky; top: 0; z-index: 100; }
+        .admin-nav .logo-text { font-weight: 700; font-size: 1.1rem; color: #DC143C; }
+        .admin-nav a { color: #ccc; text-decoration: none; font-size: .9rem; }
+        .admin-nav a:hover { color: #FFD700; }
+        .admin-container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+        .status-bar { padding: 10px 16px; border-radius: 8px; margin-bottom: 20px; font-size: .9rem; font-weight: 600; }
+        .status-online  { background: rgba(16,185,129,.2); border: 1px solid #10b981; color: #10b981; }
+        .status-offline { background: rgba(239,68,68,.2);  border: 1px solid #ef4444;  color: #ef4444;  }
+        .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .tab-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid #333; background: transparent; color: #ccc; cursor: pointer; font-size: .85rem; transition: all .2s; }
+        .tab-btn.active, .tab-btn:hover { background: #DC143C; border-color: #DC143C; color: #fff; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .card h3 { margin: 0 0 16px; font-size: 1.1rem; color: #FFD700; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: .8rem; color: #aaa; }
+        .form-group input, .form-group select, .form-group textarea { background: rgba(255,255,255,.07); border: 1px solid #333; border-radius: 8px; padding: 9px 12px; color: #f5f5f5; font-size: .9rem; outline: none; width: 100%; box-sizing: border-box; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #DC143C; }
+        .btn-submit { margin-top: 12px; padding: 10px 24px; border-radius: 20px; border: none; background: #DC143C; color: #fff; font-weight: 700; cursor: pointer; font-size: .9rem; }
+        .btn-submit:hover { background: #b01030; }
+        .btn-export { padding: 8px 18px; border-radius: 20px; border: 1px solid #FFD700; background: transparent; color: #FFD700; cursor: pointer; font-size: .85rem; }
+        .btn-export:hover { background: #FFD700; color: #000; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+        .data-table th, .data-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.07); }
+        .data-table th { color: #FFD700; font-size: .8rem; text-transform: uppercase; }
+        .data-table tr:hover td { background: rgba(255,255,255,.04); }
+        .btn-del { padding: 4px 10px; border-radius: 12px; border: 1px solid #ef4444; background: transparent; color: #ef4444; cursor: pointer; font-size: .78rem; }
+        .btn-del:hover { background: #ef4444; color: #fff; }
+        .badge-online  { background: #10b981; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: .75rem; }
+        .badge-offline { background: #6b7280; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: .75rem; }
+        #login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.9); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: rgba(30,30,30,.98); border: 1px solid #333; border-radius: 16px; padding: 40px; width: 320px; }
+        .login-box h2 { text-align: center; color: #DC143C; margin-bottom: 24px; }
+        .login-box input { width: 100%; box-sizing: border-box; }
+        .login-box .btn-submit { width: 100%; margin-top: 16px; }
+        @media(max-width:600px){ .form-grid{ grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- Login Overlay -->
+<div id="login-overlay">
+    <div class="login-box">
+        <h2>⚙️ Admin Panel</h2>
+        <p style="text-align:center;color:#888;font-size:.85rem;margin-bottom:20px;">SEMARAK AGUSTUS 2026</p>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="login-user" placeholder="admin" autocomplete="username">
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+            <label>Password</label>
+            <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="btn-submit" onclick="doLogin()">Masuk</button>
+        <p id="login-error" style="color:#ef4444;font-size:.8rem;margin-top:10px;display:none;"></p>
+    </div>
+</div>
+
+<!-- Navigation -->
+<nav class="admin-nav">
+    <span class="logo-text">⚙️ Admin Panel</span>
+    <a href="index.html">← Beranda</a>
+    <a href="hasil.html">Hasil</a>
+    <a href="event-tv.html">TV Mode</a>
+    <span style="margin-left:auto;font-size:.8rem;color:#888;" id="nav-status">–</span>
+    <button onclick="doLogout()" style="padding:6px 14px;border-radius:14px;border:1px solid #444;background:transparent;color:#ccc;cursor:pointer;font-size:.8rem;">Keluar</button>
+</nav>
+
+<div class="admin-container">
+
+    <!-- Status backend -->
+    <div id="backend-status" class="status-bar status-offline">
+        ⏳ Memeriksa koneksi backend…
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('peserta', event)">👥 Peserta</button>
+        <button class="tab-btn" onclick="switchTab('skor', event)">🏅 Skor</button>
+        <button class="tab-btn" onclick="switchTab('jadwal', event)">📅 Jadwal</button>
+        <button class="tab-btn" onclick="switchTab('juara', event)">🏆 Juara</button>
+        <button class="tab-btn" onclick="switchTab('doorprize', event)">🎁 Doorprize</button>
+        <button class="tab-btn" onclick="switchTab('sponsor', event)">🏢 Sponsor</button>
+        <button class="tab-btn" onclick="switchTab('pengumuman', event)">📢 Pengumuman</button>
+        <button class="tab-btn" onclick="switchTab('leaderboard', event)">📊 Leaderboard</button>
+    </div>
+
+    <!-- ========== PESERTA ========== -->
+    <div id="tab-peserta" class="tab-panel active">
+        <div class="card">
+            <h3>➕ Tambah Peserta</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Nama Lengkap *</label><input type="text" id="p-nama" placeholder="Nama Lengkap"></div>
+                <div class="form-group"><label>No Rumah</label><input type="text" id="p-rumah" placeholder="Blok A-01"></div>
+                <div class="form-group"><label>Korlap</label>
+                    <select id="p-korlap"><option value="">– Pilih Korlap –</option><option value="1">Korlap 1</option><option value="2">Korlap 2</option><option value="3">Korlap 3</option><option value="4">Korlap 4</option><option value="5">Korlap 5</option></select>
+                </div>
+                <div class="form-group"><label>Cabor</label><select id="p-cabor"><option value="">– Pilih Cabor –</option></select></div>
+                <div class="form-group"><label>Kategori</label><input type="text" id="p-kategori" placeholder="Dewasa / Remaja"></div>
+                <div class="form-group"><label>No HP</label><input type="text" id="p-hp" placeholder="08xx"></div>
+            </div>
+            <button class="btn-submit" onclick="submitPeserta()">Simpan Peserta</button>
+            <button class="btn-export" onclick="exportCSV('peserta')" style="margin-left:12px;">⬇ Export CSV</button>
+        </div>
+        <div class="card">
+            <h3>📋 Daftar Peserta</h3>
+            <div id="tbl-peserta-wrap" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+    <!-- ========== SKOR ========== -->
+    <div id="tab-skor" class="tab-panel">
+        <div class="card">
+            <h3>✏️ Input / Update Skor</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Jadwal Match *</label><select id="s-jadwal"><option value="">– Pilih Jadwal –</option></select></div>
+                <div class="form-group"><label>Skor Tim A</label><input type="number" id="s-a" value="0" min="0"></div>
+                <div class="form-group"><label>Skor Tim B</label><input type="number" id="s-b" value="0" min="0"></div>
+                <div class="form-group"><label>Keterangan</label><input type="text" id="s-ket" placeholder="Opsional"></div>
+                <div class="form-group"><label>Tandai Selesai?</label>
+                    <select id="s-selesai"><option value="">Tidak</option><option value="1">Ya – Tandai Selesai</option></select>
+                </div>
+            </div>
+            <button class="btn-submit" onclick="submitSkor()">Simpan Skor</button>
+        </div>
+        <div class="card">
+            <h3>📊 Data Skor</h3>
+            <div id="tbl-skor-wrap" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+    <!-- ========== JADWAL ========== -->
+    <div id="tab-jadwal" class="tab-panel">
+        <div class="card">
+            <h3>➕ Tambah Jadwal</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Nama Match *</label><input type="text" id="j-nama" placeholder="Final Voli Putri"></div>
+                <div class="form-group"><label>Cabor</label><select id="j-cabor"><option value="">– Pilih Cabor –</option></select></div>
+                <div class="form-group"><label>Tim A</label><input type="text" id="j-tima" placeholder="Tim Korlap 1"></div>
+                <div class="form-group"><label>Tim B</label><input type="text" id="j-timb" placeholder="Tim Korlap 3"></div>
+                <div class="form-group"><label>Lokasi</label><input type="text" id="j-lokasi" placeholder="Lapangan RT 007"></div>
+                <div class="form-group"><label>Waktu Mulai</label><input type="datetime-local" id="j-waktu"></div>
+                <div class="form-group"><label>Status</label>
+                    <select id="j-status"><option value="scheduled">Scheduled</option><option value="ongoing">Ongoing</option><option value="selesai">Selesai</option></select>
+                </div>
+            </div>
+            <button class="btn-submit" onclick="submitJadwal()">Simpan Jadwal</button>
+            <button class="btn-export" onclick="exportCSV('jadwal')" style="margin-left:12px;">⬇ Export CSV</button>
+        </div>
+        <div class="card">
+            <h3>📅 Daftar Jadwal</h3>
+            <div id="tbl-jadwal-wrap" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+    <!-- ========== JUARA ========== -->
+    <div id="tab-juara" class="tab-panel">
+        <div class="card">
+            <h3>🏆 Input Juara</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Nama Juara *</label><input type="text" id="jj-nama" placeholder="Nama / Tim"></div>
+                <div class="form-group"><label>Cabor</label><select id="jj-cabor"><option value="">– Pilih Cabor –</option></select></div>
+                <div class="form-group"><label>Peringkat</label>
+                    <select id="jj-peringkat"><option value="1">🥇 Juara 1</option><option value="2">🥈 Juara 2</option><option value="3">🥉 Juara 3</option></select>
+                </div>
+                <div class="form-group"><label>Korlap</label>
+                    <select id="jj-korlap"><option value="">– Pilih Korlap –</option><option value="1">Korlap 1</option><option value="2">Korlap 2</option><option value="3">Korlap 3</option><option value="4">Korlap 4</option><option value="5">Korlap 5</option></select>
+                </div>
+                <div class="form-group"><label>Keterangan</label><input type="text" id="jj-ket" placeholder="Opsional"></div>
+            </div>
+            <button class="btn-submit" onclick="submitJuara()">Simpan Juara</button>
+        </div>
+        <div class="card">
+            <h3>📋 Daftar Juara</h3>
+            <div id="tbl-juara-wrap" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+    <!-- ========== DOORPRIZE ========== -->
+    <div id="tab-doorprize" class="tab-panel">
+        <div class="card">
+            <h3>🎁 Input Pemenang Doorprize</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Hadiah / ID Doorprize *</label><select id="dp-id"><option value="">– Pilih Doorprize –</option></select></div>
+                <div class="form-group"><label>Nama Pemenang *</label><input type="text" id="dp-pemenang" placeholder="Nama Pemenang"></div>
+                <div class="form-group"><label>Korlap Pemenang</label>
+                    <select id="dp-korlap"><option value="">– Pilih Korlap –</option><option value="1">Korlap 1</option><option value="2">Korlap 2</option><option value="3">Korlap 3</option><option value="4">Korlap 4</option><option value="5">Korlap 5</option></select>
+                </div>
+                <div class="form-group"><label>Waktu Undian</label><input type="datetime-local" id="dp-waktu"></div>
+            </div>
+            <button class="btn-submit" onclick="submitDoorprizeWinner()">Simpan Pemenang</button>
+        </div>
+        <div class="card">
+            <h3>📋 Daftar Doorprize</h3>
+            <div id="tbl-doorprize-wrap" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+    <!-- ========== SPONSOR ========== -->
+    <div id="tab-sponsor" class="tab-panel">
+        <div class="card">
+            <h3>🏢 Tambah Sponsor</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Nama Sponsor *</label><input type="text" id="sp-nama" placeholder="Nama Sponsor / UMKM"></div>
+                <div class="form-group"><label>Icon / Emoji</label><input type="text" id="sp-icon" placeholder="🏢" maxlength="5"></div>
+                <div class="form-group"><label>Kategori</label><input type="text" id="sp-kategori" placeholder="Sponsor Utama / UMKM"></div>
+                <div class="form-group"><label>Kontak</label><input type="text" id="sp-kontak" placeholder="0812xxxxxxxx"></div>
+                <div class="form-group"><label>Website</label><input type="text" id="sp-website" placeholder="https://..."></div>
+                <div class="form-group"><label>Urutan Tampil</label><input type="number" id="sp-urutan" value="0" min="0"></div>
+            </div>
+            <button class="btn-submit" onclick="submitSponsor()">Simpan Sponsor</button>
+        </div>
+        <div class="card">
+            <h3>📋 Daftar Sponsor</h3>
+            <div id="tbl-sponsor-wrap" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+    <!-- ========== PENGUMUMAN ========== -->
+    <div id="tab-pengumuman" class="tab-panel">
+        <div class="card">
+            <h3>📢 Tambah Pengumuman</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Judul *</label><input type="text" id="pn-judul" placeholder="Judul Pengumuman"></div>
+                <div class="form-group"><label>Tipe</label>
+                    <select id="pn-tipe"><option value="info">Info</option><option value="success">Success</option><option value="warning">Warning</option><option value="danger">Danger</option></select>
+                </div>
+                <div class="form-group"><label>Urutan</label><input type="number" id="pn-urutan" value="0" min="0"></div>
+                <div class="form-group" style="grid-column:1/-1"><label>Isi Pengumuman *</label><textarea id="pn-isi" rows="4" placeholder="Isi pengumuman…"></textarea></div>
+            </div>
+            <button class="btn-submit" onclick="submitPengumuman()">Simpan Pengumuman</button>
+        </div>
+        <div class="card">
+            <h3>📋 Daftar Pengumuman</h3>
+            <div id="tbl-pengumuman-wrap" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+    <!-- ========== LEADERBOARD ========== -->
+    <div id="tab-leaderboard" class="tab-panel">
+        <div class="card">
+            <h3>📊 Update Poin Korlap</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Korlap *</label>
+                    <select id="lb-korlap"><option value="">– Pilih Korlap –</option><option value="1">Korlap 1</option><option value="2">Korlap 2</option><option value="3">Korlap 3</option><option value="4">Korlap 4</option><option value="5">Korlap 5</option></select>
+                </div>
+                <div class="form-group"><label>Emas 🥇</label><input type="number" id="lb-emas" value="0" min="0"></div>
+                <div class="form-group"><label>Perak 🥈</label><input type="number" id="lb-perak" value="0" min="0"></div>
+                <div class="form-group"><label>Perunggu 🥉</label><input type="number" id="lb-perunggu" value="0" min="0"></div>
+                <div class="form-group"><label>Total Poin (opsional)</label><input type="number" id="lb-total" placeholder="Auto: E×3+P×2+Br×1" min="0"></div>
+            </div>
+            <button class="btn-submit" onclick="submitLeaderboard()">Update Leaderboard</button>
+        </div>
+        <div class="card">
+            <h3>📋 Klasemen Saat Ini</h3>
+            <div id="tbl-lb-wrap" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+</div><!-- end .admin-container -->
+
+<script src="js/api.js"></script>
+<script>
+/* ============================================================
+   Admin Panel Script
+   ============================================================ */
+
+let backendOnline = false;
+let adminSession  = JSON.parse(localStorage.getItem('adminSession') || 'null');
+let caborList     = [];
+let jadwalList    = [];
+let doorprizeList = [];
+
+// ---- AUTH ---------------------------------------------------
+window.addEventListener('load', async () => {
+    if (adminSession) {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('nav-status').textContent = `👤 ${adminSession.nama}`;
+        await initPanel();
+    }
+    // Enter key on password
+    document.getElementById('login-pass').addEventListener('keydown', e => {
+        if (e.key === 'Enter') doLogin();
+    });
+});
+
+async function doLogin() {
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    const errEl = document.getElementById('login-error');
+    errEl.style.display = 'none';
+
+    if (!user || !pass) { errEl.textContent = 'Username dan password wajib diisi'; errEl.style.display='block'; return; }
+
+    // Coba login ke API backend
+    const res = await loginAdmin(user, pass);
+    if (res && res.success) {
+        adminSession = res.data;
+        localStorage.setItem('adminSession', JSON.stringify(adminSession));
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('nav-status').textContent = `👤 ${adminSession.nama}`;
+        await initPanel();
+        return;
+    }
+
+    // Fallback localStorage (offline mode)
+    const stored = localStorage.getItem('adminCreds');
+    if (stored) {
+        const creds = JSON.parse(stored);
+        if (creds.username === user && creds.password === pass) {
+            adminSession = { nama: user, offline: true };
+            localStorage.setItem('adminSession', JSON.stringify(adminSession));
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('nav-status').textContent = `👤 ${user} (offline)`;
+            await initPanel();
+            return;
+        }
+    }
+
+    errEl.textContent = res?.message || 'Login gagal. Pastikan backend aktif atau cred benar.';
+    errEl.style.display = 'block';
+}
+
+function doLogout() {
+    localStorage.removeItem('adminSession');
+    location.reload();
+}
+
+// ---- PANEL INIT ---------------------------------------------
+async function initPanel() {
+    // Cek status backend
+    const online = await checkBackend();
+    backendOnline = online;
+    const statusEl = document.getElementById('backend-status');
+    if (online) {
+        statusEl.className = 'status-bar status-online';
+        statusEl.textContent = '✅ Backend aktif – data tersimpan ke MySQL';
+    } else {
+        statusEl.className = 'status-bar status-offline';
+        statusEl.textContent = '⚠️ Backend tidak aktif – mode offline, data di localStorage';
+    }
+
+    await loadCaborOptions();
+    await loadJadwalOptions();
+    await loadDoorprizeOptions();
+    await loadTablePeserta();
+    await loadTableSkor();
+    await loadTableJadwal();
+    await loadTableJuara();
+    await loadTableDoorprize();
+    await loadTableSponsor();
+    await loadTablePengumuman();
+    await loadTableLeaderboard();
+}
+
+// ---- TABS ---------------------------------------------------
+function switchTab(name, evt) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
+}
+
+// ---- HELPERS ------------------------------------------------
+function notify(msg, type = 'info') {
+    const el = document.createElement('div');
+    el.style.cssText = `position:fixed;bottom:20px;right:20px;background:${
+        type==='success'?'#10b981':type==='danger'?'#ef4444':type==='warning'?'#f59e0b':'#3b82f6'
+    };color:#fff;padding:14px 22px;border-radius:50px;font-weight:700;z-index:99999;font-size:.9rem;`;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+}
+
+function makeTable(cols, rows, deleteCallback) {
+    if (!rows || rows.length === 0) return '<p style="color:#888;font-size:.85rem;">Belum ada data.</p>';
+    return `<table class="data-table"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}<th>Aksi</th></tr></thead><tbody>
+        ${rows.map(r => `<tr>${cols.map(c => `<td>${r[c.toLowerCase().replace(/ /g,'_')] ?? r[Object.keys(r)[cols.indexOf(c)]] ?? '–'}</td>`).join('')}
+        <td><button class="btn-del" onclick="${deleteCallback}(${r.id})">Hapus</button></td></tr>`).join('')}
+    </tbody></table>`;
+}
+
+// ---- CABOR OPTIONS ------------------------------------------
+async function loadCaborOptions() {
+    const res = await getCabor();
+    if (res && res.success) {
+        caborList = res.data;
+        const selectors = ['p-cabor','j-cabor','jj-cabor'];
+        selectors.forEach(sid => {
+            const sel = document.getElementById(sid);
+            if (!sel) return;
+            sel.innerHTML = '<option value="">– Pilih Cabor –</option>' +
+                caborList.map(c => `<option value="${c.id}">${c.icon} ${c.nama}</option>`).join('');
+        });
+    }
+}
+
+// ---- JADWAL OPTIONS -----------------------------------------
+async function loadJadwalOptions() {
+    const res = await getJadwal();
+    if (res && res.success) {
+        jadwalList = res.data;
+        const sel = document.getElementById('s-jadwal');
+        sel.innerHTML = '<option value="">– Pilih Jadwal –</option>' +
+            jadwalList.map(j => `<option value="${j.id}">${j.nama_match} (${j.tim_a || '?'} vs ${j.tim_b || '?'})</option>`).join('');
+    }
+}
+
+// ---- DOORPRIZE OPTIONS --------------------------------------
+async function loadDoorprizeOptions() {
+    const res = await getDoorprize();
+    if (res && res.success) {
+        doorprizeList = res.data;
+        const sel = document.getElementById('dp-id');
+        sel.innerHTML = '<option value="">– Pilih Doorprize –</option>' +
+            doorprizeList.map(d => `<option value="${d.id}">${d.emoji} ${d.judul} – ${d.deskripsi || ''}</option>`).join('');
+    }
+}
+
+// ---- PESERTA ------------------------------------------------
+async function submitPeserta() {
+    const nama = document.getElementById('p-nama').value.trim();
+    if (!nama) { notify('Nama peserta wajib diisi', 'warning'); return; }
+    const data = {
+        nama,
+        no_rumah: document.getElementById('p-rumah').value.trim() || null,
+        korlap_id: document.getElementById('p-korlap').value || null,
+        cabor_id: document.getElementById('p-cabor').value || null,
+        kategori: document.getElementById('p-kategori').value.trim() || null,
+        no_hp: document.getElementById('p-hp').value.trim() || null,
+    };
+    if (backendOnline) {
+        const res = await addPeserta(data);
+        if (res && res.success) { notify('Peserta berhasil ditambahkan', 'success'); await loadTablePeserta(); clearForm(['p-nama','p-rumah','p-hp','p-kategori']); }
+        else notify(res?.message || 'Gagal', 'danger');
+    } else {
+        // localStorage fallback
+        const stored = JSON.parse(localStorage.getItem('peserta_ls') || '[]');
+        stored.unshift({ id: Date.now(), ...data });
+        localStorage.setItem('peserta_ls', JSON.stringify(stored));
+        notify('Peserta tersimpan lokal (backend offline)', 'warning');
+        await loadTablePeserta();
+        clearForm(['p-nama','p-rumah','p-hp','p-kategori']);
+    }
+}
+
+async function loadTablePeserta() {
+    const wrap = document.getElementById('tbl-peserta-wrap');
+    let rows = [];
+    if (backendOnline) {
+        const res = await getPeserta();
+        if (res && res.success) rows = res.data;
+    } else {
+        rows = JSON.parse(localStorage.getItem('peserta_ls') || '[]');
+    }
+    wrap.innerHTML = rows.length === 0 ? '<p style="color:#888;">Belum ada peserta.</p>' :
+        `<table class="data-table"><thead><tr><th>#</th><th>Nama</th><th>No Rumah</th><th>Korlap</th><th>Cabor</th><th>Kategori</th><th>Aksi</th></tr></thead><tbody>
+        ${rows.map((r,i) => `<tr><td>${i+1}</td><td>${r.nama}</td><td>${r.no_rumah||'-'}</td><td>${r.nama_korlap||'-'}</td><td>${r.nama_cabor||'-'}</td><td>${r.kategori||'-'}</td>
+        <td><button class="btn-del" onclick="delPeserta(${r.id})">Hapus</button></td></tr>`).join('')}
+        </tbody></table>`;
+}
+
+async function delPeserta(id) {
+    if (!confirm('Hapus peserta ini?')) return;
+    if (backendOnline) {
+        const res = await deletePeserta(id);
+        if (res && res.success) { notify('Dihapus', 'success'); await loadTablePeserta(); }
+        else notify('Gagal menghapus', 'danger');
+    } else {
+        let stored = JSON.parse(localStorage.getItem('peserta_ls') || '[]');
+        stored = stored.filter(p => p.id !== id);
+        localStorage.setItem('peserta_ls', JSON.stringify(stored));
+        await loadTablePeserta();
+    }
+}
+
+// ---- SKOR ---------------------------------------------------
+async function submitSkor() {
+    const jadwalId = document.getElementById('s-jadwal').value;
+    if (!jadwalId) { notify('Pilih jadwal dulu', 'warning'); return; }
+    const data = {
+        jadwal_id: parseInt(jadwalId),
+        skor_a: parseInt(document.getElementById('s-a').value) || 0,
+        skor_b: parseInt(document.getElementById('s-b').value) || 0,
+        keterangan: document.getElementById('s-ket').value.trim() || null,
+        selesai: document.getElementById('s-selesai').value || null,
+        updated_by: adminSession?.nama || 'admin',
+    };
+    if (backendOnline) {
+        const res = await updateSkor(data);
+        if (res && res.success) { notify('Skor tersimpan', 'success'); await loadTableSkor(); }
+        else notify(res?.message || 'Gagal', 'danger');
+    } else {
+        notify('Backend offline – skor tidak tersimpan ke database', 'warning');
+    }
+}
+
+async function loadTableSkor() {
+    const wrap = document.getElementById('tbl-skor-wrap');
+    if (!backendOnline) { wrap.innerHTML = '<p style="color:#888;">Backend offline.</p>'; return; }
+    const res = await getSkor();
+    const rows = res?.success ? res.data : [];
+    wrap.innerHTML = rows.length === 0 ? '<p style="color:#888;">Belum ada data skor.</p>' :
+        `<table class="data-table"><thead><tr><th>#</th><th>Match</th><th>Skor A</th><th>Skor B</th><th>Status</th><th>Update</th></tr></thead><tbody>
+        ${rows.map((r,i) => `<tr><td>${i+1}</td><td>${r.nama_match}</td><td>${r.skor_a}</td><td>${r.skor_b}</td><td>${r.status_match}</td><td>${r.updated_at}</td></tr>`).join('')}
+        </tbody></table>`;
+}
+
+// ---- JADWAL -------------------------------------------------
+async function submitJadwal() {
+    const nama = document.getElementById('j-nama').value.trim();
+    if (!nama) { notify('Nama match wajib diisi', 'warning'); return; }
+    const data = {
+        nama_match: nama,
+        cabor_id: document.getElementById('j-cabor').value || null,
+        tim_a: document.getElementById('j-tima').value.trim() || null,
+        tim_b: document.getElementById('j-timb').value.trim() || null,
+        lokasi: document.getElementById('j-lokasi').value.trim() || null,
+        waktu_mulai: document.getElementById('j-waktu').value || null,
+        status: document.getElementById('j-status').value,
+    };
+    if (backendOnline) {
+        const res = await addJadwal(data);
+        if (res && res.success) {
+            notify('Jadwal ditambahkan', 'success');
+            await loadTableJadwal();
+            await loadJadwalOptions();
+            clearForm(['j-nama','j-tima','j-timb','j-lokasi','j-waktu']);
+        } else notify(res?.message || 'Gagal', 'danger');
+    } else {
+        const stored = JSON.parse(localStorage.getItem('jadwal_ls') || '[]');
+        stored.unshift({ id: Date.now(), ...data });
+        localStorage.setItem('jadwal_ls', JSON.stringify(stored));
+        notify('Jadwal tersimpan lokal', 'warning');
+        await loadTableJadwal();
+    }
+}
+
+async function loadTableJadwal() {
+    const wrap = document.getElementById('tbl-jadwal-wrap');
+    let rows = [];
+    if (backendOnline) {
+        const res = await getJadwal();
+        if (res && res.success) rows = res.data;
+    } else {
+        rows = JSON.parse(localStorage.getItem('jadwal_ls') || '[]');
+    }
+    wrap.innerHTML = rows.length === 0 ? '<p style="color:#888;">Belum ada jadwal.</p>' :
+        `<table class="data-table"><thead><tr><th>#</th><th>Match</th><th>Cabor</th><th>Tim A</th><th>Tim B</th><th>Waktu</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+        ${rows.map((r,i) => `<tr><td>${i+1}</td><td>${r.nama_match}</td><td>${r.nama_cabor||'-'}</td><td>${r.tim_a||'-'}</td><td>${r.tim_b||'-'}</td><td>${r.waktu_mulai||'-'}</td><td>${r.status}</td>
+        <td><button class="btn-del" onclick="delJadwal(${r.id})">Hapus</button></td></tr>`).join('')}
+        </tbody></table>`;
+}
+
+async function delJadwal(id) {
+    if (!confirm('Hapus jadwal ini?')) return;
+    if (backendOnline) {
+        const res = await deleteJadwal(id);
+        if (res && res.success) { notify('Dihapus', 'success'); await loadTableJadwal(); await loadJadwalOptions(); }
+        else notify('Gagal', 'danger');
+    }
+}
+
+// ---- JUARA --------------------------------------------------
+async function submitJuara() {
+    const nama = document.getElementById('jj-nama').value.trim();
+    if (!nama) { notify('Nama juara wajib diisi', 'warning'); return; }
+    const data = {
+        nama_juara: nama,
+        cabor_id: document.getElementById('jj-cabor').value || null,
+        peringkat: parseInt(document.getElementById('jj-peringkat').value) || 1,
+        korlap_id: document.getElementById('jj-korlap').value || null,
+        keterangan: document.getElementById('jj-ket').value.trim() || null,
+    };
+    if (backendOnline) {
+        const res = await addJuara(data);
+        if (res && res.success) { notify('Juara ditambahkan', 'success'); await loadTableJuara(); clearForm(['jj-nama','jj-ket']); }
+        else notify(res?.message || 'Gagal', 'danger');
+    } else {
+        const stored = JSON.parse(localStorage.getItem('juara_ls') || '[]');
+        stored.unshift({ id: Date.now(), ...data });
+        localStorage.setItem('juara_ls', JSON.stringify(stored));
+        notify('Juara tersimpan lokal', 'warning');
+        await loadTableJuara();
+    }
+}
+
+async function loadTableJuara() {
+    const wrap = document.getElementById('tbl-juara-wrap');
+    let rows = [];
+    if (backendOnline) {
+        const res = await getJuara();
+        if (res && res.success) rows = res.data;
+    } else {
+        rows = JSON.parse(localStorage.getItem('juara_ls') || '[]');
+    }
+    wrap.innerHTML = rows.length === 0 ? '<p style="color:#888;">Belum ada data juara.</p>' :
+        `<table class="data-table"><thead><tr><th>#</th><th>Cabor</th><th>Peringkat</th><th>Nama Juara</th><th>Korlap</th><th>Aksi</th></tr></thead><tbody>
+        ${rows.map((r,i) => `<tr><td>${i+1}</td><td>${r.nama_cabor||'-'}</td><td>${r.peringkat}</td><td>${r.nama_juara}</td><td>${r.nama_korlap||'-'}</td>
+        <td><button class="btn-del" onclick="delJuara(${r.id})">Hapus</button></td></tr>`).join('')}
+        </tbody></table>`;
+}
+
+async function delJuara(id) {
+    if (!confirm('Hapus juara ini?')) return;
+    if (backendOnline) {
+        const res = await deleteJuara(id);
+        if (res && res.success) { notify('Dihapus', 'success'); await loadTableJuara(); }
+        else notify('Gagal', 'danger');
+    }
+}
+
+// ---- DOORPRIZE ----------------------------------------------
+async function submitDoorprizeWinner() {
+    const dpId = document.getElementById('dp-id').value;
+    const pemenang = document.getElementById('dp-pemenang').value.trim();
+    if (!dpId || !pemenang) { notify('Pilih doorprize dan isi nama pemenang', 'warning'); return; }
+    const existing = doorprizeList.find(d => d.id == dpId) || {};
+    const data = {
+        judul: existing.judul || '-',
+        deskripsi: existing.deskripsi || null,
+        nilai: existing.nilai || null,
+        emoji: existing.emoji || '🎁',
+        peringkat: existing.peringkat || 1,
+        pemenang,
+        korlap_id: document.getElementById('dp-korlap').value || null,
+        waktu_undian: document.getElementById('dp-waktu').value || null,
+    };
+    if (backendOnline) {
+        const res = await addDoorprizeWinner(parseInt(dpId), data);
+        if (res && res.success) { notify('Pemenang disimpan!', 'success'); await loadTableDoorprize(); clearForm(['dp-pemenang','dp-waktu']); }
+        else notify(res?.message || 'Gagal', 'danger');
+    } else {
+        notify('Backend offline – data tidak tersimpan ke DB', 'warning');
+    }
+}
+
+async function loadTableDoorprize() {
+    const wrap = document.getElementById('tbl-doorprize-wrap');
+    const res = await getDoorprize();
+    const rows = res?.success ? res.data : [];
+    wrap.innerHTML = rows.length === 0 ? '<p style="color:#888;">Belum ada data doorprize.</p>' :
+        `<table class="data-table"><thead><tr><th>#</th><th>Hadiah</th><th>Nilai</th><th>Pemenang</th><th>Korlap</th><th>Waktu</th></tr></thead><tbody>
+        ${rows.map((r,i) => `<tr><td>${i+1}</td><td>${r.emoji} ${r.judul}</td><td>${r.nilai||'-'}</td><td>${r.pemenang||'<em style="color:#888">Belum diundi</em>'}</td><td>${r.nama_korlap||'-'}</td><td>${r.waktu_undian||'-'}</td></tr>`).join('')}
+        </tbody></table>`;
+}
+
+// ---- SPONSOR ------------------------------------------------
+async function submitSponsor() {
+    const nama = document.getElementById('sp-nama').value.trim();
+    if (!nama) { notify('Nama sponsor wajib diisi', 'warning'); return; }
+    const data = {
+        nama,
+        icon: document.getElementById('sp-icon').value.trim() || '🏢',
+        kategori: document.getElementById('sp-kategori').value.trim() || null,
+        kontak: document.getElementById('sp-kontak').value.trim() || null,
+        website: document.getElementById('sp-website').value.trim() || null,
+        urutan: parseInt(document.getElementById('sp-urutan').value) || 0,
+    };
+    if (backendOnline) {
+        const res = await addSponsor(data);
+        if (res && res.success) { notify('Sponsor ditambahkan', 'success'); await loadTableSponsor(); clearForm(['sp-nama','sp-icon','sp-kategori','sp-kontak','sp-website']); }
+        else notify(res?.message || 'Gagal', 'danger');
+    } else {
+        const stored = JSON.parse(localStorage.getItem('sponsor_ls') || '[]');
+        stored.unshift({ id: Date.now(), ...data });
+        localStorage.setItem('sponsor_ls', JSON.stringify(stored));
+        notify('Sponsor tersimpan lokal', 'warning');
+        await loadTableSponsor();
+    }
+}
+
+async function loadTableSponsor() {
+    const wrap = document.getElementById('tbl-sponsor-wrap');
+    let rows = [];
+    if (backendOnline) {
+        const res = await getSponsor();
+        if (res && res.success) rows = res.data;
+    } else {
+        rows = JSON.parse(localStorage.getItem('sponsor_ls') || '[]');
+    }
+    wrap.innerHTML = rows.length === 0 ? '<p style="color:#888;">Belum ada sponsor.</p>' :
+        `<table class="data-table"><thead><tr><th>#</th><th>Nama</th><th>Kategori</th><th>Kontak</th><th>Aksi</th></tr></thead><tbody>
+        ${rows.map((r,i) => `<tr><td>${i+1}</td><td>${r.icon||'🏢'} ${r.nama}</td><td>${r.kategori||'-'}</td><td>${r.kontak||'-'}</td>
+        <td><button class="btn-del" onclick="delSponsor(${r.id})">Hapus</button></td></tr>`).join('')}
+        </tbody></table>`;
+}
+
+async function delSponsor(id) {
+    if (!confirm('Hapus sponsor ini?')) return;
+    if (backendOnline) {
+        const res = await deleteSponsor(id);
+        if (res && res.success) { notify('Dihapus', 'success'); await loadTableSponsor(); }
+        else notify('Gagal', 'danger');
+    }
+}
+
+// ---- PENGUMUMAN ---------------------------------------------
+async function submitPengumuman() {
+    const judul = document.getElementById('pn-judul').value.trim();
+    const isi   = document.getElementById('pn-isi').value.trim();
+    if (!judul || !isi) { notify('Judul dan isi wajib diisi', 'warning'); return; }
+    const data = {
+        judul, isi,
+        tipe: document.getElementById('pn-tipe').value,
+        urutan: parseInt(document.getElementById('pn-urutan').value) || 0,
+    };
+    if (backendOnline) {
+        const res = await addPengumuman(data);
+        if (res && res.success) { notify('Pengumuman ditambahkan', 'success'); await loadTablePengumuman(); clearForm(['pn-judul','pn-isi']); }
+        else notify(res?.message || 'Gagal', 'danger');
+    } else {
+        const stored = JSON.parse(localStorage.getItem('pengumuman_ls') || '[]');
+        stored.unshift({ id: Date.now(), ...data });
+        localStorage.setItem('pengumuman_ls', JSON.stringify(stored));
+        notify('Pengumuman tersimpan lokal', 'warning');
+        await loadTablePengumuman();
+    }
+}
+
+async function loadTablePengumuman() {
+    const wrap = document.getElementById('tbl-pengumuman-wrap');
+    let rows = [];
+    if (backendOnline) {
+        const res = await getPengumuman();
+        if (res && res.success) rows = res.data;
+    } else {
+        rows = JSON.parse(localStorage.getItem('pengumuman_ls') || '[]');
+    }
+    wrap.innerHTML = rows.length === 0 ? '<p style="color:#888;">Belum ada pengumuman.</p>' :
+        `<table class="data-table"><thead><tr><th>#</th><th>Judul</th><th>Tipe</th><th>Isi</th><th>Aksi</th></tr></thead><tbody>
+        ${rows.map((r,i) => `<tr><td>${i+1}</td><td>${r.judul}</td><td>${r.tipe}</td><td>${(r.isi||'').substring(0,60)}…</td>
+        <td><button class="btn-del" onclick="delPengumuman(${r.id})">Hapus</button></td></tr>`).join('')}
+        </tbody></table>`;
+}
+
+async function delPengumuman(id) {
+    if (!confirm('Hapus pengumuman ini?')) return;
+    if (backendOnline) {
+        const res = await deletePengumuman(id);
+        if (res && res.success) { notify('Dihapus', 'success'); await loadTablePengumuman(); }
+        else notify('Gagal', 'danger');
+    }
+}
+
+// ---- LEADERBOARD --------------------------------------------
+async function submitLeaderboard() {
+    const korlapId = document.getElementById('lb-korlap').value;
+    if (!korlapId) { notify('Pilih korlap', 'warning'); return; }
+    const emas     = parseInt(document.getElementById('lb-emas').value) || 0;
+    const perak    = parseInt(document.getElementById('lb-perak').value) || 0;
+    const perunggu = parseInt(document.getElementById('lb-perunggu').value) || 0;
+    const total    = document.getElementById('lb-total').value;
+    const data     = { korlap_id: parseInt(korlapId), emas, perak, perunggu };
+    if (total) data.total_poin = parseInt(total);
+    if (backendOnline) {
+        const res = await updateLeaderboard(data);
+        if (res && res.success) { notify('Leaderboard diupdate', 'success'); await loadTableLeaderboard(); }
+        else notify(res?.message || 'Gagal', 'danger');
+    } else {
+        notify('Backend offline – update tidak tersimpan', 'warning');
+    }
+}
+
+async function loadTableLeaderboard() {
+    const wrap = document.getElementById('tbl-lb-wrap');
+    const res = await getLeaderboard();
+    const rows = res?.success ? res.data : [];
+    wrap.innerHTML = rows.length === 0 ? '<p style="color:#888;">Belum ada data.</p>' :
+        `<table class="data-table"><thead><tr><th>Peringkat</th><th>Korlap</th><th>🥇</th><th>🥈</th><th>🥉</th><th>Total</th></tr></thead><tbody>
+        ${rows.map(r => `<tr><td>${r.peringkat}</td><td>${r.nama_korlap}</td><td>${r.emas}</td><td>${r.perak}</td><td>${r.perunggu}</td><td><strong>${r.total_poin}</strong></td></tr>`).join('')}
+        </tbody></table>`;
+}
+
+// ---- EXPORT CSV ---------------------------------------------
+async function exportCSV(type) {
+    let rows = [], filename = '', cols = [];
+    if (type === 'peserta') {
+        const res = await getPeserta();
+        rows = res?.success ? res.data : JSON.parse(localStorage.getItem('peserta_ls') || '[]');
+        cols = ['id','nama','no_rumah','nama_korlap','nama_cabor','kategori','no_hp','created_at'];
+        filename = 'peserta-agustusan-2026.csv';
+    } else if (type === 'jadwal') {
+        const res = await getJadwal();
+        rows = res?.success ? res.data : JSON.parse(localStorage.getItem('jadwal_ls') || '[]');
+        cols = ['id','nama_match','nama_cabor','tim_a','tim_b','lokasi','waktu_mulai','status'];
+        filename = 'jadwal-agustusan-2026.csv';
+    }
+    if (!rows.length) { notify('Tidak ada data untuk diekspor', 'warning'); return; }
+    let csv = cols.join(',') + '\n';
+    rows.forEach(r => {
+        csv += cols.map(c => `"${(r[c] ?? '').toString().replace(/"/g,'""')}"`).join(',') + '\n';
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    notify('CSV berhasil diunduh!', 'success');
+}
+
+// ---- UTIL ---------------------------------------------------
+function clearForm(ids) {
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+}
+</script>
+</body>
+</html>
