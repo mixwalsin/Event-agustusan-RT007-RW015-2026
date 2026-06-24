@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Panitia - SEMARAK AGUSTUS 2026 | RT 007 RW 015 TCI 2</title>
+    <meta name="description" content="Dashboard Panel Panitia/Admin Event Agustusan Digital 2026 RT 007 RW 015">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23DC143C'>🇮🇩</text></svg>">
+    <style>
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px 0;
+        }
+        @media (max-width: 768px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-text">🔑 PANEL PANITIA</span>
+                <p class="tagline">Event Agustusan Digital 2026</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Beranda</a></li>
+                <li><a href="daftar.html" class="nav-link">Pendaftaran</a></li>
+                <li><a href="hasil.html" class="nav-link">Hasil Event</a></li>
+                <li><a href="galeri.html" class="nav-link">Galeri</a></li>
+                <li><a href="event-tv.html" class="nav-link">Live TV</a></li>
+                <li><a href="admin.html" class="nav-link active">Admin Panel</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Hero -->
+    <section class="hasil-hero" style="background: linear-gradient(135deg, var(--dark), var(--primary)); min-height: 40vh; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--light); padding-top: 100px;">
+        <div class="container">
+            <h1 class="hasil-title">PANEL UTAMA PANITIA</h1>
+            <p class="hasil-subtitle">Manajemen Pendaftaran, Voting, & Doorprize Real-time</p>
+            <p class="hasil-desc">Khusus Panitia Pelaksana RT 007 RW 015 TCI 2</p>
+        </div>
+    </section>
+
+    <!-- Admin Panels -->
+    <main class="container">
+        <div class="admin-grid">
+            <!-- Left Side: Registration Management -->
+            <div class="admin-card glass" style="padding: 25px; border-radius: 20px;">
+                <h2 style="color: var(--accent); margin-bottom: 20px;">📋 Manajemen Pendaftaran Cabor</h2>
+                <div class="admin-actions-bar" style="margin-bottom: 20px; display: flex; gap: 15px;">
+                    <button class="btn btn-primary" onclick="exportRegistrations()">📥 Ekspor CSV</button>
+                    <button class="btn btn-secondary" onclick="alert('Pembersihan database cloud hanya dapat dilakukan via konsol admin Supabase.')">🧹 Hapus Semua</button>
+                </div>
+                <div id="registration-list" class="registration-list" style="max-height: 400px; overflow-y: auto;">
+                    <p class="empty-state">Loading pendaftaran warga...</p>
+                </div>
+            </div>
+
+            <!-- Right Side: Real-time Voting Monitoring -->
+            <div class="admin-card glass" style="padding: 25px; border-radius: 20px;">
+                <h2 style="color: var(--accent); margin-bottom: 20px;">🗳️ Hasil Pemantauan Voting</h2>
+                <p style="margin-bottom: 20px; font-size: 14px; color: #ccc;">Suara yang masuk dari warga terhitung real-time di Supabase cloud database.</p>
+                <div id="voting-results" class="voting-result-panel">
+                    <p class="empty-state">Loading hasil voting...</p>
+                </div>
+            </div>
+
+            <!-- Full Width: Doorprize Draw simulator -->
+            <div class="admin-card glass" style="padding: 25px; border-radius: 20px; grid-column: 1 / -1;">
+                <h2 style="color: var(--accent); margin-bottom: 20px; text-align: center;">🎁 Undian Doorprize Digital</h2>
+                <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+                    <div id="doorprize-display" class="doorprize-display" style="background: rgba(0,0,0,0.3); padding: 30px; border-radius: 15px; border: 1px dashed var(--accent); margin-bottom: 25px; font-size: 24px; font-weight: bold; color: var(--light);">
+                        Menunggu Tarikan Undian...
+                    </div>
+                    <button class="btn btn-primary btn-large" onclick="drawDoorprize()">🎰 MULAI UNDIAN RANDOM</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 SEMARAK AGUSTUS - RT 007 RW 015 TCI 2. Admin Panel Secure Dashboard.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVENT TV - SEMARAK AGUSTUS 2026 | RT 007 RW 015 TCI 2</title>
+    <meta name="description" content="Tampilan Live TV & Proyektor Event Agustusan Digital 2026 RT 007 RW 015">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23DC143C'>🇮🇩</text></svg>">
+    <style>
+        body {
+            background: #0d0d13;
+            color: #ffffff;
+        }
+        .broadcast-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            padding: 40px 0;
+        }
+        @media (max-width: 1024px) {
+            .broadcast-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .video-box {
+            position: relative;
+            background: linear-gradient(135deg, #1f1f2e, #11111a);
+            border-radius: 20px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+        }
+        .video-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .live-tag {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 14px;
+            letter-spacing: 1px;
+            animation: pulse 1.5s infinite;
+        }
+        .viewers-badge {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .stream-duration {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .ticker-container {
+            grid-column: 1 / -1;
+            background: #11111a;
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 15px 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .ticker-text {
+            display: inline-block;
+            animation: ticker 25s linear infinite;
+            font-size: 16px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(100%, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" style="background: rgba(13, 13, 19, 0.95); border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-text">📺 SEMARAK AGUSTUS TV</span>
+                <p class="tagline">TCI 2 Digital Broadcast Hub</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Beranda</a></li>
+                <li><a href="daftar.html" class="nav-link">Pendaftaran</a></li>
+                <li><a href="hasil.html" class="nav-link">Hasil Event</a></li>
+                <li><a href="galeri.html" class="nav-link">Galeri</a></li>
+                <li><a href="event-tv.html" class="nav-link active">Live TV</a></li>
+                <li><a href="admin.html" class="nav-link">Admin Panel</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- TV Main Screen -->
+    <main class="container" style="margin-top: 120px;">
+        <div class="broadcast-container">
+            <!-- Left Side: Streaming Player -->
+            <div class="broadcast-main">
+                <div class="video-box">
+                    <div class="video-overlay">
+                        <span class="live-tag">🔴 LIVE</span>
+                        <div class="viewers-badge">
+                            👥 <span id="viewers-count">2.450</span> Penonton
+                        </div>
+                    </div>
+                    
+                    <div class="stream-content" style="text-align: center;">
+                        <span style="font-size: 80px;">🏆</span>
+                        <h2 style="font-size: 28px; margin-top: 20px; color: var(--accent);">SEMARAK AGUSTUS 2026</h2>
+                        <p style="color: #888; font-size: 16px;">Menampilkan highlight pertandingan dan live data feeds.</p>
+                        <div class="broadcast-gimmick" style="margin-top: 20px; padding: 10px 20px; background: rgba(220, 20, 60, 0.2); border-radius: 50px; font-weight: bold; display: inline-block;">
+                            🎥 MULTICAM PROYEKSI UTAMA
+                        </div>
+                    </div>
+
+                    <div class="stream-duration">
+                        ⏱️ DURASI: <span id="duration">00:00:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Live Scores -->
+            <div class="broadcast-sidebar">
+                <div class="live-score-sidebar-box glass" style="padding: 25px; border-radius: 20px; background: rgba(255,255,255,0.02); height: 100%;">
+                    <h3 style="font-size: 20px; margin-bottom: 20px; color: var(--accent); display: flex; align-items: center; gap: 10px;">
+                        <span>📊</span> Real-time Match Feed
+                    </h3>
+                    <div id="live-score-wrapper" class="live-score-wrapper" style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Filled by script.js / tv.js -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom: Running Ticker -->
+            <div class="ticker-container">
+                <div class="ticker-text">
+                    📢 LIVE BROADCAST HUT RI KE-81 • SEMARAK AGUSTUS 2026 DIGITAL • RT 007 RW 015 TCI 2 • JALAN SEHAT & SENAM BERSAMA PUKUL 07:00 WIB • PETUNJUK PENDAFTARAN DAPAT DIAKSES VIA MENU PENDAFTARAN • TETAP SPORTIF DAN GUYUB WARGA RT 007!
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" style="background: #09090e; margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.05);">
+        <div class="container">
+            <div class="footer-bottom" style="border: none; padding: 0;">
+                <p>&copy; 2026 SEMARAK AGUSTUS - RT 007 RW 015 TCI 2. Broadcast Hub Powered by Vanilla JS.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/tv.js"></script>
+</body>
+</html>

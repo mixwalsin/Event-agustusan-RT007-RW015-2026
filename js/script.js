@@ -6,7 +6,28 @@
 // ======== INITIALIZATION & KONEKSI DATABASE ========
 const SUPABASE_URL = "https://tjrqubmjndqxlwcrrszl.supabase.co"; 
 const SUPABASE_KEY = "tjrqubmjndgxlwcrrszl"; // Ganti dengan anon public key asli dari dasbor Supabase Anda jika diperlukan
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : {
+    from: () => ({
+        insert: async () => ({ data: [], error: null }),
+        select: () => ({
+            eq: () => ({
+                order: async () => ({ data: [], error: null })
+            }),
+            order: async () => ({ data: [], error: null })
+        })
+    })
+};
+
+// ======== UTILITY FUNCTIONS ========
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     initCountdown();
@@ -145,8 +166,8 @@ async function loadRegistrations() {
     listContainer.innerHTML = registrations.map(reg => `
         <div class="registration-item">
             <div class="registration-item-info">
-                <span class="registration-item-badge">${reg.cabang_olahraga}</span>
-                <strong>${reg.nama_warga}</strong> <small>(Rumah: ${reg.nomor_rumah})</small>
+                <span class="registration-item-badge">${escapeHTML(reg.cabang_olahraga)}</span>
+                <strong>${escapeHTML(reg.nama_warga)}</strong> <small>(Rumah: ${escapeHTML(reg.nomor_rumah)})</small>
             </div>
         </div>
     `).join('');
@@ -325,7 +346,7 @@ function drawDoorprize() {
         const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
         const noKTP = String(Math.floor(Math.random() * 1000000000)).padStart(10, '0');
         
-        display.innerHTML = `${randomPrize}<br><small>No. KTP: ${noKTP}</small>`;
+        display.innerHTML = `${escapeHTML(randomPrize)}<br><small>No. KTP: ${escapeHTML(noKTP)}</small>`;
         display.classList.add('winner');
         display.style.cursor = 'pointer';
 
@@ -372,7 +393,7 @@ async function vote(korlap) {
     const tahunBerjalan = new Date().getFullYear();
     const kategoriVote = "Terkompak"; 
 
-    showNotification(` Adil & Terbuka: Mengirimkan suara Anda untuk ${korlap}...`, "info");
+    showNotification(`Adil & Terbuka: Mengirimkan suara Anda untuk ${korlap}...`, "info");
 
     const { error } = await supabase
         .from('voting_warga')
@@ -553,12 +574,12 @@ function loadPassportData() {
     passportCard.innerHTML = `
         <div class="passport-card-display">
             <h4>🎫 PASSPORT WARGA</h4>
-            <p class="name">${passportData.name}</p>
-            <p><strong>No. KTP:</strong> ${passportData.ktp}</p>
-            <p><strong>Email:</strong> ${passportData.email}</p>
-            <p><strong>Telepon:</strong> ${passportData.phone}</p>
-            <p><strong>Korlap:</strong> ${passportData.korlap}</p>
-            <p><strong>Tanggal Daftar:</strong> ${passportData.registrationDate}</p>
+            <p class="name">${escapeHTML(passportData.name)}</p>
+            <p><strong>No. KTP:</strong> ${escapeHTML(passportData.ktp)}</p>
+            <p><strong>Email:</strong> ${escapeHTML(passportData.email)}</p>
+            <p><strong>Telepon:</strong> ${escapeHTML(passportData.phone)}</p>
+            <p><strong>Korlap:</strong> ${escapeHTML(passportData.korlap)}</p>
+            <p><strong>Tanggal Daftar:</strong> ${escapeHTML(passportData.registrationDate)}</p>
             <button class="btn btn-secondary" onclick="clearPassport()" style="margin-top: 15px;">Hapus Data</button>
         </div>
     `;
@@ -592,9 +613,9 @@ function generateCertificate() {
             <div class="certificate-content">
                 <h2>SERTIFIKAT</h2>
                 <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Ini menyatakan bahwa</p>
-                <div class="cert-name">${name}</div>
+                <div class="cert-name">${escapeHTML(name)}</div>
                 <p style="font-size: 14px; margin-bottom: 10px;">Telah berpartisipasi sebagai</p>
-                <div class="cert-category">${category}</div>
+                <div class="cert-category">${escapeHTML(category)}</div>
                 <p style="font-size: 12px; color: #666; margin-top: 20px;">Dalam Kegiatan</p>
                 <p style="font-weight: 700; color: var(--primary); margin-top: 10px;">SEMARAK AGUSTUS 2026<br>HUT RI KE-81</p>
                 <p style="font-size: 11px; color: #999; margin-top: 20px;">RT 007 RW 015 TCI 2</p>
